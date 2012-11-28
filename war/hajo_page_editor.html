@@ -33,17 +33,17 @@
   <!-- to create a completely dynamic UI.        -->
   <!--                                           -->
   <body>
-  	<div id="canvas" class="bootstrap" style="margin: auto; position: relative; width: 760px;"/>
+  	<div id="canvas" style="margin: auto; position: relative; width: 760px;">preview content in here</div>
   	
   	<form id="image_upload" action="/image_upload_url" method="POST" enctype="multipart/form-data">
-  		<input type="file" name="weDontCare">
-  		<input type="submit" text="weDontCare">
+  		<input type="file" name="weDontCare"/>
+  		<input type="submit" text="weDontCare"/>
   	</form>
   	
   	<form id="state_storage" action="/state_storage_url" method="POST">
-  		<textarea id="html_output" name="html_output" />
+  		<textarea id="html_output" name="html_output"></textarea>
   		<textarea id="json_state" name="json_state"></textarea>
-  		<input type="submit" text="weDontCare">
+  		<input type="submit" text="weDontCare"/>
   	</form>
   </body>
 </html>

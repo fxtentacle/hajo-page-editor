@@ -5,7 +5,7 @@
 			<g:FlowPanel styleName="bootstrap hajo-toolbar" />
 		</g:layer>
 		<g:layer top="80px" bottom="0px" left="0px" right="0px">
-			<g:HTMLPanel ui:field="canvas" />
+			<g:FlowPanel ui:field="canvas" />
 		</g:layer>
 	</g:LayoutPanel>
 </ui:UiBinder> 
