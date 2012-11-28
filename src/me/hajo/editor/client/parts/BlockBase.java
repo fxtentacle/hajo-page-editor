@@ -1,26 +1,32 @@
 package me.hajo.editor.client.parts;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import me.hajo.editor.client.GuiContainer;
 import me.hajo.editor.client.HajoPagePart;
+import me.hajo.editor.helpers.DropdownHelper;
+import me.hajo.editor.helpers.DropdownHelper.DropdownCallback;
+import me.hajo.editor.helpers.DropdownHelper.DropdownEntry;
 import me.hajo.editor.helpers.HajoToolbar;
 import me.hajo.editor.helpers.HajoToolbar.Group;
-import me.hajo.editor.helpers.LIWrapper;
 import me.hajo.editor.helpers.LinkButton;
-import me.hajo.editor.helpers.LinkWithIcon;
-import me.hajo.editor.helpers.ListPanel;
 
+import com.gargoylesoftware.htmlunit.javascript.host.css.ComputedCSSStyleDeclaration;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.BorderStyle;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -44,14 +50,12 @@ public class BlockBase extends Composite implements HajoPagePart {
 
 	protected FlowPanel page;
 
-	private Group changeType;
-
 	public BlockBase(final FlowPanel page) {
-		Map<String, String> type2icon = new HashMap<String, String>();
-		type2icon.put("Text", "");
-		type2icon.put("Image", "");
-		type2icon.put("Split", "");
-		type2icon.put("Center", "");
+		List<DropdownEntry> entries = new ArrayList<DropdownEntry>();
+		entries.add(new DropdownEntry("Text", ""));
+		entries.add(new DropdownEntry("Image", ""));
+		entries.add(new DropdownEntry("Split", ""));
+		entries.add(new DropdownEntry("Center", ""));
 
 		this.page = page;
 		initWidget(uiBinder.createAndBindUi(this));
@@ -83,33 +87,15 @@ public class BlockBase extends Composite implements HajoPagePart {
 			}
 		}));
 
-		changeType = toolbar.addGroup();
-		final ListPanel typeDropdown = new ListPanel();
-		typeDropdown.setStyleName("dropdown-menu");
-
-		for (final Entry<String, String> cur : type2icon.entrySet()) {
-			typeDropdown.add(new LinkWithIcon(cur.getValue(), cur.getKey(), "", new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					// close drop-down
-					changeType.setStyleName("btn-group");
-
-					int idx = page.getWidgetIndex(BlockBase.this);
-					page.remove(BlockBase.this);
-					Widget newWidget = convertToType(cur.getKey(), BlockBase.this);
-					page.insert(newWidget, idx);
-				}
-			}));
-		}
-
-		changeType.addCustom("type_dropdown", new LinkButton("caret", "Change type", "dropdown-toggle", new ClickHandler() {
+		DropdownHelper.makeDropdown(toolbar.addGroup(), "Change type", entries, new DropdownCallback() {
 			@Override
-			public void onClick(ClickEvent event) {
-				boolean open = !changeType.getStyleName().contains("open");
-				changeType.setStyleName("btn-group" + (open ? " open" : ""));
+			public void OnSelect(String key) {
+				int idx = page.getWidgetIndex(BlockBase.this);
+				page.remove(BlockBase.this);
+				Widget newWidget = convertToType(key, BlockBase.this);
+				page.insert(newWidget, idx);
 			}
-		}));
-		changeType.add(typeDropdown);
+		});
 	}
 
 	protected Widget convertToType(String type, BlockBase old) {
@@ -117,5 +103,31 @@ public class BlockBase extends Composite implements HajoPagePart {
 			return new TextBlock(page);
 		}
 		return null;
+	}
+
+	@Override
+	public void encode(SafeHtmlBuilder shb) {
+	}
+
+	public static class StyledItem {
+		SafeHtml open;
+		SafeHtml close;
+
+		public StyledItem(SafeHtml open, SafeHtml close) {
+			super();
+			this.open = open;
+			this.close = close;
+		}
+	}
+
+	protected StyledItem getStyledItemInContext(String tag, String context) {
+		String stexName = "stex_" + context.replaceAll("[^a-zA-Z]", "_") + "_" + tag;
+		Element stex = DOM.getElementById(stexName);
+
+		if (stex == null)
+			return new StyledItem(SafeHtmlUtils.fromTrustedString("<" + tag + ">"), SafeHtmlUtils.fromTrustedString("</" + tag + ">"));
+
+		String safeStyleString = stex.getStyle().getProperty("cssText");
+		return new StyledItem(SafeHtmlUtils.fromTrustedString("<" + stex.getTagName() + " style=\"" + safeStyleString + "\">"), SafeHtmlUtils.fromTrustedString("</" + stex.getTagName() + ">"));
 	}
 }
