@@ -5,6 +5,7 @@ import me.hajo.editor.helpers.LinkButton;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.FlowPanel;
 
 public class AddBlockButton extends FlowPanel implements HajoPagePart {
@@ -20,4 +21,7 @@ public class AddBlockButton extends FlowPanel implements HajoPagePart {
 		}));
 	}
 
+	@Override
+	public void encode(SafeHtmlBuilder shb) {
+	}
 }
