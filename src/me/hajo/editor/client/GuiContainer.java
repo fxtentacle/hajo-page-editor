@@ -2,6 +2,7 @@ package me.hajo.editor.client;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import me.hajo.editor.client.EntryPoint.StateStorage;
 import me.hajo.editor.client.parts.AddBlockButton;
@@ -41,7 +42,16 @@ public class GuiContainer extends ResizeComposite {
 
 	final LinkButton previewToggle;
 
-	public GuiContainer(HTMLPanel ocanvas, String image_upload_url, final StateStorage stateStorage) {
+	ImageUploader imageUploader;
+
+	public static class ImagesAvailable {
+		public String image_download_url;
+		public Map<String, String> id2name;
+	}
+
+	ImagesAvailable imagesAvailable = new ImagesAvailable();
+
+	public GuiContainer(HTMLPanel ocanvas, String image_upload_url, String image_download_url, final StateStorage stateStorage) {
 		initWidget(uiBinder.createAndBindUi(this));
 		toolbarContainer.add(toolbar);
 		ocanvas.removeFromParent();
@@ -71,6 +81,9 @@ public class GuiContainer extends ResizeComposite {
 			}
 		}));
 
+		imageUploader = new ImageUploader(image_upload_url);
+		imagesAvailable.image_download_url = image_download_url;
+		imagesAvailable.id2name = imageUploader.getMap();
 	}
 
 	List<HajoPagePart> parts = new ArrayList<HajoPagePart>();
