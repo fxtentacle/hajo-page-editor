@@ -29,6 +29,11 @@ public class LinkButton extends Button implements HasEnabled {
 		addClickHandler(handler);
 	}
 
+	public LinkButton(String icon, SafeHtml title, String buttonStyle, ClickHandler handler) {
+		init(icon, title, buttonStyle);
+		addClickHandler(handler);
+	}
+
 	public LinkButton(String icon, String title, String buttonStyle, final String historyToken) {
 		init(icon, title, buttonStyle);
 		addClickHandler(new ClickHandler() {
@@ -44,6 +49,14 @@ public class LinkButton extends Button implements HasEnabled {
 			setText(title);
 		else
 			replaceIconText(icon, title);
+		replaceButtonStyle(buttonStyle);
+	}
+
+	public void init(String icon, SafeHtml title, String buttonStyle) {
+		if (icon == null)
+			setHTML(title);
+		else
+			replaceIconHtml(icon, title);
 		replaceButtonStyle(buttonStyle);
 	}
 

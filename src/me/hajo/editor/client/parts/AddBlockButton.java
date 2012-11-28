@@ -16,7 +16,7 @@ public class AddBlockButton extends FlowPanel implements HajoPagePart {
 			@Override
 			public void onClick(ClickEvent event) {
 				int idx = page.getWidgetIndex(AddBlockButton.this);
-				page.insert(new BlockBase(page), idx);
+				page.insert(new BlockBase(page, -1), idx);
 			}
 		}));
 	}

@@ -46,7 +46,7 @@ public class BlockBase extends Composite implements HajoPagePart {
 
 	protected FlowPanel page;
 
-	public BlockBase(final FlowPanel page) {
+	public BlockBase(final FlowPanel page, final int selectedType) {
 		List<DropdownEntry> entries = new ArrayList<DropdownEntry>();
 		entries.add(new DropdownEntry("Text", ""));
 		entries.add(new DropdownEntry("Image", ""));
@@ -83,7 +83,7 @@ public class BlockBase extends Composite implements HajoPagePart {
 			}
 		}));
 
-		DropdownHelper.makeDropdown(toolbar.addGroup(), "Change type", entries, new DropdownCallback() {
+		DropdownHelper.makeDropdown(toolbar.addGroup(), "Type: ", true, entries, selectedType, new DropdownCallback() {
 			@Override
 			public void OnSelect(String key) {
 				int idx = page.getWidgetIndex(BlockBase.this);

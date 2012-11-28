@@ -1,9 +1,7 @@
 package me.hajo.editor.client.parts;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import me.hajo.editor.client.HajoPagePart;
 import me.hajo.editor.helpers.DropdownHelper;
@@ -96,14 +94,15 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 	protected String currentStyle = "Paragraph";
 
 	public TextBlock(final FlowPanel page) {
-		super(page);
+		super(page, 0);
 
 		List<DropdownEntry> entries = new ArrayList<DropdownEntry>();
 		entries.add(new DropdownEntry("Headline", ""));
 		entries.add(new DropdownEntry("Sub-Headline", ""));
 		entries.add(new DropdownEntry("Paragraph", ""));
 
-		DropdownHelper.makeDropdown(toolbar.addGroup(), "Style", entries, new DropdownCallback() {
+		currentStyle = "Headline";
+		DropdownHelper.makeDropdown(toolbar.addGroup(), "Style: ", true, entries, 0, new DropdownCallback() {
 			@Override
 			public void OnSelect(String key) {
 				currentStyle = key;
