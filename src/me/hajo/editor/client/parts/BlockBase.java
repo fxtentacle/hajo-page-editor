@@ -1,9 +1,7 @@
 package me.hajo.editor.client.parts;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import me.hajo.editor.client.HajoPagePart;
 import me.hajo.editor.helpers.DropdownHelper;
@@ -13,7 +11,6 @@ import me.hajo.editor.helpers.HajoToolbar;
 import me.hajo.editor.helpers.HajoToolbar.Group;
 import me.hajo.editor.helpers.LinkButton;
 
-import com.gargoylesoftware.htmlunit.javascript.host.css.ComputedCSSStyleDeclaration;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.BorderStyle;
@@ -26,7 +23,6 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -122,12 +118,19 @@ public class BlockBase extends Composite implements HajoPagePart {
 
 	protected StyledItem getStyledItemInContext(String tag, String context) {
 		String stexName = "stex_" + context.replaceAll("[^a-zA-Z]", "_") + "_" + tag;
-		Element stex = DOM.getElementById(stexName);
+		com.google.gwt.dom.client.Element stex = DOM.getElementById(stexName);
 
 		if (stex == null)
 			return new StyledItem(SafeHtmlUtils.fromTrustedString("<" + tag + ">"), SafeHtmlUtils.fromTrustedString("</" + tag + ">"));
 
-		String safeStyleString = stex.getStyle().getProperty("cssText");
-		return new StyledItem(SafeHtmlUtils.fromTrustedString("<" + stex.getTagName() + " style=\"" + safeStyleString + "\">"), SafeHtmlUtils.fromTrustedString("</" + stex.getTagName() + ">"));
+		tag = stex.getTagName();
+		String safeStyleString = "";
+		while (stex != null) {
+			if (stex.getId().equals("stex"))
+				break;
+			safeStyleString = stex.getStyle().getProperty("cssText") + ";" + safeStyleString;
+			stex = stex.getParentElement();
+		}
+		return new StyledItem(SafeHtmlUtils.fromTrustedString("<" + tag + " style=\"" + safeStyleString + "\">"), SafeHtmlUtils.fromTrustedString("</" + tag + ">"));
 	}
 }
