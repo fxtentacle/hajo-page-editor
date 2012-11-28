@@ -42,6 +42,7 @@ public class GuiContainer extends ResizeComposite {
 
 	final LinkButton previewToggle;
 
+	@UiField(provided = true)
 	ImageUploader imageUploader;
 
 	public static class ImagesAvailable {
@@ -52,6 +53,7 @@ public class GuiContainer extends ResizeComposite {
 	ImagesAvailable imagesAvailable = new ImagesAvailable();
 
 	public GuiContainer(HTMLPanel ocanvas, String image_upload_url, String image_download_url, final StateStorage stateStorage) {
+		imageUploader = new ImageUploader(image_upload_url);
 		initWidget(uiBinder.createAndBindUi(this));
 		toolbarContainer.add(toolbar);
 		ocanvas.removeFromParent();
@@ -81,7 +83,6 @@ public class GuiContainer extends ResizeComposite {
 			}
 		}));
 
-		imageUploader = new ImageUploader(image_upload_url);
 		imagesAvailable.image_download_url = image_download_url;
 		imagesAvailable.id2name = imageUploader.getMap();
 	}
