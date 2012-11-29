@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.hajo.editor.client.HajoPagePart;
-import me.hajo.editor.client.HajoPagePart.ImageRescaleCollector;
 import me.hajo.editor.helpers.DropdownHelper;
 import me.hajo.editor.helpers.DropdownHelper.DropdownCallback;
 import me.hajo.editor.helpers.DropdownHelper.DropdownEntry;
@@ -59,17 +58,29 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 	protected SafeHtml makeSafeHtml(String text2) {
 		StyledItem useP = getStyledItemInContext("p", currentStyle);
 		StyledItem usePL = getStyledItemInContext("p", currentStyle + "L");
+		StyledItem usePR = getStyledItemInContext("p", currentStyle + "R");
 		StyledItem useS = getStyledItemInContext("strong", currentStyle);
 
 		SafeHtmlBuilder shb = new SafeHtmlBuilder();
 		String[] paragraphs = text2.split("\n");
 		for (String para : paragraphs) {
+			if (para.length() == 0)
+				continue;
+
 			boolean justify = para.startsWith("=");
+			boolean right = para.startsWith(">");
+			boolean left = para.startsWith("<");
 			if (justify)
+				para = para.substring(1);
+			if (right)
+				para = para.substring(1);
+			if (left)
 				para = para.substring(1);
 
 			if (justify)
 				shb.append(useP.open);
+			else if (right)
+				shb.append(usePR.open);
 			else
 				shb.append(usePL.open);
 
@@ -86,6 +97,8 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 
 			if (justify)
 				shb.append(useP.close);
+			else if (right)
+				shb.append(usePR.close);
 			else
 				shb.append(usePL.close);
 		}
