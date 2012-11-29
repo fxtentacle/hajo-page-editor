@@ -2,8 +2,6 @@ package me.hajo.editor.helpers;
 
 import java.util.List;
 
-import me.hajo.editor.helpers.DropdownHelper.DropdownEntry;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
