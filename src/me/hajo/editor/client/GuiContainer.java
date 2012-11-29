@@ -86,7 +86,7 @@ public class GuiContainer extends ResizeComposite {
 	}
 
 	public static ImagesAvailable imagesAvailable = new ImagesAvailable();
-	
+
 	public GuiContainer(HTMLPanel ocanvas, String image_download_url, final String close_link, final StateStorage stateStorage) {
 		imageUploader = new ImageUploader();
 		initWidget(uiBinder.createAndBindUi(this));
@@ -109,7 +109,6 @@ public class GuiContainer extends ResizeComposite {
 			@Override
 			public void onClick(ClickEvent event) {
 				boolean makeActive = !previewToggle.getStyleName().contains("active");
-				previewToggle.setStyleName("active btn-primary", makeActive);
 				reRender(makeActive);
 			}
 		}));
@@ -185,6 +184,8 @@ public class GuiContainer extends ResizeComposite {
 	private LinkButton saveButton;
 
 	protected void reRender(boolean goToPreview) {
+		previewToggle.setStyleName("active btn-primary", goToPreview);
+
 		if (goToPreview) {
 			selectedItemChanged(null);
 
@@ -213,6 +214,8 @@ public class GuiContainer extends ResizeComposite {
 		new Timer() {
 			@Override
 			public void run() {
+				reRender(false);
+
 				PagePartStorage state = page.serialize();
 				JSONValue json = stateEncoderDecoder.encode(state);
 				String text = json.toString().replaceAll("\\s*\"[^\"]+\":null,?\\s*", "");
