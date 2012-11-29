@@ -21,7 +21,9 @@ public class EntryPoint implements com.google.gwt.core.client.EntryPoint {
 
 		public void setHTML(String html);
 
-		public void setRequiredImages(String html);
+		public String getRequiredImages();
+
+		public void setRequiredImages(String text);
 
 		public void sendToServer(SubmitCompleteHandler handler);
 	}
@@ -70,6 +72,11 @@ public class EntryPoint implements com.google.gwt.core.client.EntryPoint {
 			@Override
 			public String getState() {
 				return json_state.getText();
+			}
+
+			@Override
+			public String getRequiredImages() {
+				return required_images.getText();
 			}
 		}));
 	}

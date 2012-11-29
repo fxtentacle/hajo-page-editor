@@ -8,7 +8,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 
 public interface HajoPagePart {
 	public interface ImageRescaleCollector {
-		public String addRequest(String fullURL, int width);
+		public String addRequest(String imageID, String filename, int width);
 	}
 
 	public void encode(SafeHtmlBuilder shb, ImageRescaleCollector irc);

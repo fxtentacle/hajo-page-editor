@@ -48,7 +48,10 @@ public class ImageBlock extends BlockBase implements HajoPagePart {
 			return TEMPLATES.mkimage(url, "100%");
 		} else {
 			int width = getWidth();
-			return TEMPLATES.mkimage(irc.addRequest(url, width), width + "px");
+			String filename = GuiContainer.imagesAvailable.id2name.get(selectedImageID);
+			if (filename == null)
+				filename = "unknown";
+			return TEMPLATES.mkimage(irc.addRequest(selectedImageID, filename, width), width + "px");
 		}
 	}
 

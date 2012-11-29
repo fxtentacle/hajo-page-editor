@@ -116,6 +116,19 @@ public class GuiContainer extends ResizeComposite {
 		imagesAvailable.image_download_url = image_download_url;
 		imagesAvailable.id2name = imageUploader.getMap();
 
+		String reqi = stateStorage.getRequiredImages();
+		String[] lines = reqi.split("\n");
+		for (String cur : lines) {
+			String[] parts = cur.trim().split("\t");
+			if (parts.length < 4)
+				continue;
+
+			// dummyUrl + "\t" + width + "\t" + filename + "\t" + imageID);
+			imagesAvailable.id2name.put(parts[3], parts[2]);
+			imageUploader.idOrdering.add(parts[3]);
+		}
+		imageUploader.repaint();
+
 		PagePartStorage state = stateEncoderDecoder.decode(JSONParser.parseStrict(stateStorage.getState()));
 		if (state != null)
 			page.deserialize(state);
@@ -154,11 +167,11 @@ public class GuiContainer extends ResizeComposite {
 	protected void reRender(boolean goToPreview) {
 		if (goToPreview) {
 			selectedItemChanged(null);
-			
+
 			ImageRescaleCollector irc = new ImageRescaleCollector() {
 				@Override
-				public String addRequest(String fullURL, int width) {
-					return fullURL + "&width=" + width;
+				public String addRequest(String imageID, String filename, int width) {
+					return imagesAvailable.image_download_url + imageID + "&width=" + width + "&name=" + filename;
 				}
 			};
 			SafeHtmlBuilder shb = new SafeHtmlBuilder();
@@ -183,14 +196,14 @@ public class GuiContainer extends ResizeComposite {
 		final List<String> imageList = new ArrayList<String>();
 		ImageRescaleCollector irc = new ImageRescaleCollector() {
 			@Override
-			public String addRequest(String fullURL, int width) {
+			public String addRequest(String imageID, String filename, int width) {
 				String ext = "";
-				int lastDot = fullURL.lastIndexOf('.');
+				int lastDot = filename.lastIndexOf('.');
 				if (lastDot > 0)
-					ext = fullURL.substring(lastDot);
+					ext = filename.substring(lastDot);
 
 				String url = "http://FAKEHOST/" + ImageUploader.makeRandomID() + ext;
-				imageList.add(url + "\t" + width + "\t" + fullURL);
+				imageList.add(url + "\t" + width + "\t" + filename + "\t" + imageID);
 				return url;
 			}
 		};

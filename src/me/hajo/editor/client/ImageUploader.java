@@ -123,7 +123,7 @@ public class ImageUploader extends Composite {
 		});
 	}
 
-	private void repaint() {
+	void repaint() {
 		files.clear();
 		for (final String key : idOrdering) {
 			files.add(new LinkButton("icon-remove", id2name.get(key), "", new ClickHandler() {
