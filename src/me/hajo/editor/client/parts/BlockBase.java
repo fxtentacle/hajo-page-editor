@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.hajo.editor.client.HajoPagePart;
+import me.hajo.editor.client.HajoPagePart.ImageRescaleCollector;
 import me.hajo.editor.helpers.DropdownHelper;
 import me.hajo.editor.helpers.DropdownHelper.DropdownCallback;
 import me.hajo.editor.helpers.DropdownHelper.DropdownEntry;
@@ -97,12 +98,14 @@ public class BlockBase extends Composite implements HajoPagePart {
 	protected Widget convertToType(String type, BlockBase old) {
 		if (type.equals("Text")) {
 			return new TextBlock(page);
+		} else if (type.equals("Image")) {
+			return new ImageBlock(page);
 		}
 		return null;
 	}
 
 	@Override
-	public void encode(SafeHtmlBuilder shb) {
+	public void encode(SafeHtmlBuilder shb, ImageRescaleCollector irc) {
 	}
 
 	public static class StyledItem {

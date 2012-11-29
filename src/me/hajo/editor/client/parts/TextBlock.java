@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.hajo.editor.client.HajoPagePart;
+import me.hajo.editor.client.HajoPagePart.ImageRescaleCollector;
 import me.hajo.editor.helpers.DropdownHelper;
 import me.hajo.editor.helpers.DropdownHelper.DropdownCallback;
 import me.hajo.editor.helpers.DropdownHelper.DropdownEntry;
@@ -117,7 +118,7 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 	}
 
 	@Override
-	public void encode(SafeHtmlBuilder shb) {
+	public void encode(SafeHtmlBuilder shb, ImageRescaleCollector irc) {
 		shb.append(makeSafeHtml(editor.getText()));
 	}
 }

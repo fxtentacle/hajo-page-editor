@@ -1,6 +1,7 @@
 package me.hajo.editor.client.parts;
 
 import me.hajo.editor.client.HajoPagePart;
+import me.hajo.editor.client.HajoPagePart.ImageRescaleCollector;
 import me.hajo.editor.helpers.LinkButton;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -22,6 +23,6 @@ public class AddBlockButton extends FlowPanel implements HajoPagePart {
 	}
 
 	@Override
-	public void encode(SafeHtmlBuilder shb) {
+	public void encode(SafeHtmlBuilder shb, ImageRescaleCollector irc) {
 	}
 }
