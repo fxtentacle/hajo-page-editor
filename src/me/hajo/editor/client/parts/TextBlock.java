@@ -48,9 +48,12 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 		StyledItem usePR = getStyledItemInContext("p", currentStyle + "R");
 		StyledItem usePC = getStyledItemInContext("p", currentStyle + "C");
 		StyledItem useS = getStyledItemInContext("strong", currentStyle);
+		StyledItem useUL = getStyledItemInContext("ul", currentStyle);
+		StyledItem useLI = getStyledItemInContext("li", currentStyle);
 
 		SafeHtmlBuilder shb = new SafeHtmlBuilder();
 		String[] paragraphs = text2.split("\n");
+		boolean isInList = false;
 		for (String para : paragraphs) {
 			if (para.length() == 0)
 				continue;
@@ -59,20 +62,33 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 			boolean right = para.startsWith(">");
 			boolean left = para.startsWith("<");
 			boolean center = para.startsWith("|");
-			if (justify || left || right || center)
+			boolean list = para.startsWith("*");
+			if (justify || left || right || center || list)
 				para = para.substring(1);
 
+			if (list && !isInList) {
+				isInList = true;
+				shb.append(useUL.open);
+			} else if (!list && isInList) {
+				isInList = false;
+				shb.append(useUL.close);
+			}
+
 			final StyledItem useMe;
-			if (justify)
-				useMe = useP;
-			else if (left)
-				useMe = usePL;
-			else if (right)
-				useMe = usePR;
-			else if (center)
-				useMe = usePC;
-			else
-				useMe = usePL;
+			if (isInList) {
+				useMe = useLI;
+			} else {
+				if (justify)
+					useMe = useP;
+				else if (left)
+					useMe = usePL;
+				else if (right)
+					useMe = usePR;
+				else if (center)
+					useMe = usePC;
+				else
+					useMe = usePL;
+			}
 
 			if (para.startsWith("LINK[")) {
 				String[] parts = para.split("[\\[\\]]+");
@@ -130,6 +146,9 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 				shb.append(useMe.close);
 			}
 		}
+
+		if (isInList)
+			shb.append(useUL.close);
 		return shb.toSafeHtml();
 	}
 
