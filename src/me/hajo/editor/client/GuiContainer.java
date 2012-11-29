@@ -8,6 +8,7 @@ import me.hajo.editor.client.EntryPoint.StateStorage;
 import me.hajo.editor.client.HajoPagePart.ImageRescaleCollector;
 import me.hajo.editor.client.parts.AddBlockButton;
 import me.hajo.editor.client.parts.ImageBlock;
+import me.hajo.editor.client.parts.SplitBlock;
 import me.hajo.editor.client.parts.TextBlock;
 import me.hajo.editor.helpers.HajoToolbar;
 import me.hajo.editor.helpers.LinkButton;
@@ -63,6 +64,7 @@ public class GuiContainer extends ResizeComposite {
 		page = new FlowPanel();
 		ocanvas.add(page);
 
+		page.add(new SplitBlock(page));
 		page.add(new ImageBlock(page));
 		page.add(new TextBlock(page));
 		page.add(new AddBlockButton(page));

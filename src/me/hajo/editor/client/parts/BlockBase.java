@@ -100,6 +100,8 @@ public class BlockBase extends Composite implements HajoPagePart {
 			return new TextBlock(page);
 		} else if (type.equals("Image")) {
 			return new ImageBlock(page);
+		} else if (type.equals("Split")) {
+			return new SplitBlock(page);
 		}
 		return null;
 	}
