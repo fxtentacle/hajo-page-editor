@@ -5,3 +5,5 @@
 /gwt-unitCache/
 /.gwt/
 /war/WEB-INF/deploy/hajo_page_editor/symbolMaps/
+
+/test_server
