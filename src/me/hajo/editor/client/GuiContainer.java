@@ -28,6 +28,7 @@ import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.ResizeComposite;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class GuiContainer extends ResizeComposite {
@@ -43,7 +44,7 @@ public class GuiContainer extends ResizeComposite {
 	private static GuiContainerUiBinder uiBinder = GWT.create(GuiContainerUiBinder.class);
 
 	@UiField
-	FlowPanel canvas;
+	ScrollPanel canvas;
 
 	@UiField
 	FlowPanel toolbarContainer;
@@ -77,10 +78,6 @@ public class GuiContainer extends ResizeComposite {
 		page = new HajoPage(-1);
 		page.add(new AddBlockButton(page));
 
-		PagePartStorage state = stateEncoderDecoder.decode(JSONParser.parseStrict(stateStorage.getState()));
-		if (state != null)
-			page.deserialize(state);
-
 		content.clear();
 		content.add(page);
 
@@ -102,6 +99,10 @@ public class GuiContainer extends ResizeComposite {
 
 		imagesAvailable.image_download_url = image_download_url;
 		imagesAvailable.id2name = imageUploader.getMap();
+
+		PagePartStorage state = stateEncoderDecoder.decode(JSONParser.parseStrict(stateStorage.getState()));
+		if (state != null)
+			page.deserialize(state);
 	}
 
 	List<HajoPagePart> parts = new ArrayList<HajoPagePart>();

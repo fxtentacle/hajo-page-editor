@@ -180,12 +180,15 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 	public PagePartStorage serialize() {
 		PagePartStorage pps = new PagePartStorage("Text");
 		pps.Text = editor.getText();
+		pps.TextStyle = currentStyle;
 		return pps;
 	}
 
 	@Override
 	public void deserialize(PagePartStorage pps) {
 		editor.setText(pps.Text);
+		if (pps.TextStyle != null)
+			currentStyle = pps.TextStyle;
 		goToDisplayMode();
 	}
 }

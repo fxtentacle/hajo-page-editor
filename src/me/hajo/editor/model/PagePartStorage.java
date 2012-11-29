@@ -12,6 +12,7 @@ public class PagePartStorage {
 
 	public String Type;
 	public String Text;
+	public String TextStyle;
 	public String ImageID;
 	public Integer Width;
 	public Integer Split;

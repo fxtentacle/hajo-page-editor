@@ -160,10 +160,17 @@ public class SplitBlock extends BlockBase implements HajoPagePart {
 	public void deserialize(PagePartStorage pps) {
 		currentSplit = pps.Split;
 		currentPadding = pps.Padding;
-		left = new HajoPage(-1);
-		right = new HajoPage(-1);
+		left.clear();
+		right.clear();
 		updatePageWidth(pps.Width);
 		left.deserialize(pps.Children.get(0));
 		right.deserialize(pps.Children.get(1));
+
+		Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+			@Override
+			public void execute() {
+				updateSplit();
+			}
+		});
 	}
 }
