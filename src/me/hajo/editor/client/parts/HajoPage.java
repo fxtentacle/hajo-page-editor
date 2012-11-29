@@ -1,6 +1,9 @@
 package me.hajo.editor.client.parts;
 
+import java.util.ArrayList;
+
 import me.hajo.editor.client.HajoPagePart;
+import me.hajo.editor.model.PagePartStorage;
 
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -8,9 +11,9 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class HajoPage extends FlowPanel implements HajoPagePart {
 
-	public int pageWidth;
+	public int pageWidth = -1;
 
-	public HajoPage(final FlowPanel page, int pageWidth) {
+	public HajoPage(int pageWidth) {
 		this.pageWidth = pageWidth;
 		setStyleName("hajopage");
 	}
@@ -26,6 +29,29 @@ public class HajoPage extends FlowPanel implements HajoPagePart {
 			if (w instanceof HajoPagePart) {
 				((HajoPagePart) w).encode(shb, irc);
 			}
+		}
+	}
+
+	@Override
+	public PagePartStorage serialize() {
+		PagePartStorage pps = new PagePartStorage("Page");
+		pps.Children = new ArrayList<PagePartStorage>();
+		for (int i = 0; i < getWidgetCount(); i++) {
+			Widget w = getWidget(i);
+			if (w instanceof HajoPagePart) {
+				pps.Children.add(((HajoPagePart) w).serialize());
+			}
+		}
+		return pps;
+	}
+
+	@Override
+	public void deserialize(PagePartStorage storage) {
+		clear();
+		for (PagePartStorage cur : storage.Children) {
+			HajoPagePart w = BlockBase.createWidgetOfType(cur.Type, this);
+			w.deserialize(cur);
+			add((Widget) w);
 		}
 	}
 }

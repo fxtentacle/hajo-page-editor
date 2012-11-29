@@ -10,6 +10,7 @@ import me.hajo.editor.helpers.DropdownHelper.DropdownEntry;
 import me.hajo.editor.helpers.HajoToolbar;
 import me.hajo.editor.helpers.HajoToolbar.Group;
 import me.hajo.editor.helpers.LinkButton;
+import me.hajo.editor.model.PagePartStorage;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
@@ -91,15 +92,17 @@ public class BlockBase extends Composite implements HajoPagePart {
 			public void OnSelect(String key) {
 				int idx = page.getWidgetIndex(BlockBase.this);
 				page.remove(BlockBase.this);
-				Widget newWidget = convertToType(key, BlockBase.this);
+				HajoPagePart newWidget = createWidgetOfType(key, page);
 				if (newWidget != null)
-					page.insert(newWidget, idx);
+					page.insert((Widget) newWidget, idx);
 			}
 		});
 	}
 
-	protected Widget convertToType(String type, BlockBase old) {
-		if (type.equals("Text")) {
+	public static HajoPagePart createWidgetOfType(String type, FlowPanel page) {
+		if (type.equals("Add")) {
+			return new AddBlockButton(page);
+		} else if (type.equals("Text")) {
 			return new TextBlock(page);
 		} else if (type.equals("Image")) {
 			return new ImageBlock(page);
@@ -109,8 +112,9 @@ public class BlockBase extends Composite implements HajoPagePart {
 			return new CenterBlock(page);
 		} else if (type.equals("Spacer")) {
 			return new SpacerBlock(page);
+		} else {
+			return new BlockBase(page, -1);
 		}
-		return null;
 	}
 
 	@Override
@@ -130,8 +134,11 @@ public class BlockBase extends Composite implements HajoPagePart {
 
 	protected int getWidth() {
 		Widget p = getParent();
-		if (p instanceof HajoPage)
-			return ((HajoPage) p).pageWidth;
+		if (p instanceof HajoPage) {
+			int hpw = ((HajoPage) p).pageWidth;
+			if (hpw > 0)
+				return hpw;
+		}
 		return content.getOffsetWidth() + 2;
 	}
 
@@ -156,4 +163,14 @@ public class BlockBase extends Composite implements HajoPagePart {
 		}
 		return new StyledItem(SafeHtmlUtils.fromTrustedString("<" + tag + " style=\"" + safeStyleString + "\" " + additionalAttrbutes + " >"), SafeHtmlUtils.fromTrustedString("</" + tag + ">"));
 	}
+
+	@Override
+	public PagePartStorage serialize() {
+		return new PagePartStorage("Base");
+	}
+
+	@Override
+	public void deserialize(PagePartStorage storage) {
+	}
+
 }

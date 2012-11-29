@@ -1,5 +1,7 @@
 package me.hajo.editor.client;
 
+import me.hajo.editor.model.PagePartStorage;
+
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 
 public interface HajoPagePart {
@@ -8,4 +10,8 @@ public interface HajoPagePart {
 	}
 
 	public void encode(SafeHtmlBuilder shb, ImageRescaleCollector irc);
+
+	public PagePartStorage serialize();
+
+	public void deserialize(PagePartStorage storage);
 }

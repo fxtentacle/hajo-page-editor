@@ -2,6 +2,7 @@ package me.hajo.editor.client.parts;
 
 import me.hajo.editor.client.HajoPagePart;
 import me.hajo.editor.helpers.LinkButton;
+import me.hajo.editor.model.PagePartStorage;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -23,5 +24,14 @@ public class AddBlockButton extends FlowPanel implements HajoPagePart {
 
 	@Override
 	public void encode(SafeHtmlBuilder shb, ImageRescaleCollector irc) {
+	}
+
+	@Override
+	public PagePartStorage serialize() {
+		return new PagePartStorage("Add");
+	}
+
+	@Override
+	public void deserialize(PagePartStorage storage) {
 	}
 }

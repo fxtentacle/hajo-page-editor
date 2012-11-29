@@ -4,18 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.fusesource.restygwt.client.JsonEncoderDecoder;
+
 import me.hajo.editor.client.EntryPoint.StateStorage;
 import me.hajo.editor.client.HajoPagePart.ImageRescaleCollector;
 import me.hajo.editor.client.parts.AddBlockButton;
+import me.hajo.editor.client.parts.HajoPage;
 import me.hajo.editor.client.parts.ImageBlock;
 import me.hajo.editor.client.parts.SplitBlock;
 import me.hajo.editor.client.parts.TextBlock;
 import me.hajo.editor.helpers.HajoToolbar;
 import me.hajo.editor.helpers.LinkButton;
+import me.hajo.editor.model.PagePartStorage;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -28,10 +33,16 @@ import com.google.gwt.user.client.ui.ResizeComposite;
 import com.google.gwt.user.client.ui.Widget;
 
 public class GuiContainer extends ResizeComposite {
-	private static GuiContainerUiBinder uiBinder = GWT.create(GuiContainerUiBinder.class);
+
+	interface StateEncoderDecoder extends JsonEncoderDecoder<PagePartStorage> {
+	}
+
+	private StateEncoderDecoder stateEncoderDecoder = GWT.create(StateEncoderDecoder.class);
 
 	interface GuiContainerUiBinder extends UiBinder<Widget, GuiContainer> {
 	}
+
+	private static GuiContainerUiBinder uiBinder = GWT.create(GuiContainerUiBinder.class);
 
 	@UiField
 	FlowPanel canvas;
@@ -41,7 +52,9 @@ public class GuiContainer extends ResizeComposite {
 
 	HajoToolbar toolbar = new HajoToolbar();
 
-	FlowPanel page;
+	HTMLPanel content;
+	HajoPage page;
+	HTML preview = new HTML();
 
 	final LinkButton previewToggle;
 
@@ -59,15 +72,17 @@ public class GuiContainer extends ResizeComposite {
 		imageUploader = new ImageUploader(image_upload_url);
 		initWidget(uiBinder.createAndBindUi(this));
 		toolbarContainer.add(toolbar);
-		ocanvas.removeFromParent();
-		canvas.add(ocanvas);
-		page = new FlowPanel();
-		ocanvas.add(page);
+		this.content = ocanvas;
+		content.removeFromParent();
+		canvas.add(content);
 
+		page = new HajoPage(-1);
 		page.add(new SplitBlock(page));
 		page.add(new ImageBlock(page));
 		page.add(new TextBlock(page));
 		page.add(new AddBlockButton(page));
+		content.clear();
+		content.add(page);
 
 		toolbar.addCustom("preview", previewToggle = new LinkButton("", "Preview", "", new ClickHandler() {
 			@Override
@@ -80,6 +95,9 @@ public class GuiContainer extends ResizeComposite {
 		toolbar.addCustom("save", new LinkButton("icon-save", "Save", "btn-success", new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				PagePartStorage state = page.serialize();
+				JSONValue json = stateEncoderDecoder.encode(state);
+				stateStorage.setState(json.toString());
 				stateStorage.sendToServer(new SubmitCompleteHandler() {
 					@Override
 					public void onSubmitComplete(SubmitCompleteEvent event) {
@@ -94,16 +112,8 @@ public class GuiContainer extends ResizeComposite {
 
 	List<HajoPagePart> parts = new ArrayList<HajoPagePart>();
 
-	protected void reRender(boolean preview) {
-		if (preview) {
-			for (int i = 0; i < page.getWidgetCount(); i++) {
-				Widget w = page.getWidget(i);
-				if (w instanceof HajoPagePart) {
-					parts.add((HajoPagePart) w);
-				}
-			}
-
-			// first collect HTML while still visible
+	protected void reRender(boolean goToPreview) {
+		if (goToPreview) {
 			ImageRescaleCollector irc = new ImageRescaleCollector() {
 				@Override
 				public String addRequest(String fullURL, int width) {
@@ -111,19 +121,14 @@ public class GuiContainer extends ResizeComposite {
 				}
 			};
 			SafeHtmlBuilder shb = new SafeHtmlBuilder();
-			for (HajoPagePart cur : parts) {
-				cur.encode(shb, irc);
-			}
+			page.encode(shb, irc);
 
-			// then clear and replace
-			page.clear();
-			page.add(new HTML(shb.toSafeHtml()));
+			content.clear();
+			preview.setHTML(shb.toSafeHtml());
+			content.add(preview);
 		} else {
-			page.clear();
-			for (HajoPagePart cur : parts) {
-				page.add((Widget) cur);
-			}
-			parts.clear();
+			content.clear();
+			content.add(page);
 		}
 	}
 }

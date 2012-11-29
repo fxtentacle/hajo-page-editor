@@ -7,6 +7,7 @@ import me.hajo.editor.client.HajoPagePart;
 import me.hajo.editor.helpers.DropdownHelper;
 import me.hajo.editor.helpers.DropdownHelper.DropdownCallback;
 import me.hajo.editor.helpers.DropdownHelper.DropdownEntry;
+import me.hajo.editor.model.PagePartStorage;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
@@ -33,7 +34,7 @@ public class CenterBlock extends BlockBase implements HajoPagePart {
 	public CenterBlock(final FlowPanel page) {
 		super(page, 3);
 
-		center = new HajoPage(page, -1);
+		center = new HajoPage(-1);
 		center.add(new AddBlockButton(center));
 		Style s = center.getElement().getStyle();
 		s.setProperty("margin", "0px auto");
@@ -91,5 +92,23 @@ public class CenterBlock extends BlockBase implements HajoPagePart {
 	public void updatePageWidth(int width) {
 		final int w = (int) ((double) width * (double) currentSplit / 8.0);
 		center.setPageWidth(w);
+	}
+
+	@Override
+	public PagePartStorage serialize() {
+		PagePartStorage pps = new PagePartStorage("Center");
+		pps.Width = getWidth();
+		pps.Split = currentSplit;
+		pps.Children = new ArrayList<PagePartStorage>();
+		pps.Children.add(center.serialize());
+		return pps;
+	}
+
+	@Override
+	public void deserialize(PagePartStorage pps) {
+		currentSplit = pps.Split;
+		center = new HajoPage(-1);
+		updatePageWidth(pps.Width);
+		center.deserialize(pps.Children.get(0));
 	}
 }

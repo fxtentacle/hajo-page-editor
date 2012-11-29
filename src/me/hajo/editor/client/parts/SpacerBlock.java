@@ -7,6 +7,7 @@ import me.hajo.editor.client.HajoPagePart;
 import me.hajo.editor.helpers.DropdownHelper;
 import me.hajo.editor.helpers.DropdownHelper.DropdownCallback;
 import me.hajo.editor.helpers.DropdownHelper.DropdownEntry;
+import me.hajo.editor.model.PagePartStorage;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
@@ -60,5 +61,18 @@ public class SpacerBlock extends BlockBase implements HajoPagePart {
 	@Override
 	public void encode(SafeHtmlBuilder shb, ImageRescaleCollector irc) {
 		fill(shb);
+	}
+
+	@Override
+	public PagePartStorage serialize() {
+		PagePartStorage pps = new PagePartStorage("Spacer");
+		pps.Split = currentSplit;
+		return pps;
+	}
+
+	@Override
+	public void deserialize(PagePartStorage pps) {
+		currentSplit = pps.Split;
+		updateSplit();
 	}
 }

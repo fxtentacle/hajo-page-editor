@@ -7,6 +7,7 @@ import me.hajo.editor.client.HajoPagePart;
 import me.hajo.editor.helpers.DropdownHelper;
 import me.hajo.editor.helpers.DropdownHelper.DropdownCallback;
 import me.hajo.editor.helpers.DropdownHelper.DropdownEntry;
+import me.hajo.editor.model.PagePartStorage;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
@@ -37,10 +38,10 @@ public class SplitBlock extends BlockBase implements HajoPagePart {
 	public SplitBlock(final FlowPanel page) {
 		super(page, 2);
 
-		left = new HajoPage(page, -1);
+		left = new HajoPage(-1);
 		left.add(new AddBlockButton(left));
 
-		right = new HajoPage(page, -1);
+		right = new HajoPage(-1);
 		right.add(new AddBlockButton(right));
 
 		left.getElement().getStyle().setFloat(Float.LEFT);
@@ -141,5 +142,28 @@ public class SplitBlock extends BlockBase implements HajoPagePart {
 		}
 		left.setPageWidth(lw);
 		right.setPageWidth(rw);
+	}
+
+	@Override
+	public PagePartStorage serialize() {
+		PagePartStorage pps = new PagePartStorage("Split");
+		pps.Width = getWidth();
+		pps.Split = currentSplit;
+		pps.Padding = currentPadding;
+		pps.Children = new ArrayList<PagePartStorage>();
+		pps.Children.add(left.serialize());
+		pps.Children.add(right.serialize());
+		return pps;
+	}
+
+	@Override
+	public void deserialize(PagePartStorage pps) {
+		currentSplit = pps.Split;
+		currentPadding = pps.Padding;
+		left = new HajoPage(-1);
+		right = new HajoPage(-1);
+		updatePageWidth(pps.Width);
+		left.deserialize(pps.Children.get(0));
+		right.deserialize(pps.Children.get(1));
 	}
 }

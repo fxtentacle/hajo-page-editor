@@ -10,6 +10,7 @@ import me.hajo.editor.client.HajoPagePart;
 import me.hajo.editor.helpers.DropdownHelper;
 import me.hajo.editor.helpers.DropdownHelper.DropdownCallback;
 import me.hajo.editor.helpers.DropdownHelper.DropdownEntry;
+import me.hajo.editor.model.PagePartStorage;
 
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
@@ -173,5 +174,18 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 	@Override
 	public void encode(SafeHtmlBuilder shb, ImageRescaleCollector irc) {
 		shb.append(makeSafeHtml(editor.getText()));
+	}
+
+	@Override
+	public PagePartStorage serialize() {
+		PagePartStorage pps = new PagePartStorage("Text");
+		pps.Text = editor.getText();
+		return pps;
+	}
+
+	@Override
+	public void deserialize(PagePartStorage pps) {
+		editor.setText(pps.Text);
+		goToDisplayMode();
 	}
 }
