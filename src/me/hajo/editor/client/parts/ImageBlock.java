@@ -1,7 +1,5 @@
 package me.hajo.editor.client.parts;
 
-import java.util.ArrayList;
-
 import me.hajo.editor.client.GuiContainer;
 import me.hajo.editor.client.HajoPagePart;
 import me.hajo.editor.model.PagePartStorage;

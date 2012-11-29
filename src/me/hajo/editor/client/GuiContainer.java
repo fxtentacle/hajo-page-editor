@@ -4,23 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.fusesource.restygwt.client.JsonEncoderDecoder;
-
 import me.hajo.editor.client.EntryPoint.StateStorage;
 import me.hajo.editor.client.HajoPagePart.ImageRescaleCollector;
 import me.hajo.editor.client.parts.AddBlockButton;
 import me.hajo.editor.client.parts.HajoPage;
-import me.hajo.editor.client.parts.ImageBlock;
-import me.hajo.editor.client.parts.SplitBlock;
-import me.hajo.editor.client.parts.TextBlock;
 import me.hajo.editor.helpers.HajoToolbar;
 import me.hajo.editor.helpers.LinkButton;
 import me.hajo.editor.model.PagePartStorage;
 
+import org.fusesource.restygwt.client.JsonEncoderDecoder;
+
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dev.util.Strings;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -78,10 +75,12 @@ public class GuiContainer extends ResizeComposite {
 		canvas.add(content);
 
 		page = new HajoPage(-1);
-		page.add(new SplitBlock(page));
-		page.add(new ImageBlock(page));
-		page.add(new TextBlock(page));
 		page.add(new AddBlockButton(page));
+
+		PagePartStorage state = stateEncoderDecoder.decode(JSONParser.parseStrict(stateStorage.getState()));
+		if (state != null)
+			page.deserialize(state);
+
 		content.clear();
 		content.add(page);
 
@@ -132,7 +131,9 @@ public class GuiContainer extends ResizeComposite {
 	public void savePage(final StateStorage stateStorage) {
 		PagePartStorage state = page.serialize();
 		JSONValue json = stateEncoderDecoder.encode(state);
-		stateStorage.setState(json.toString());
+		String text = json.toString().replaceAll("\\s*\"[^\"]+\":null,?\\s*", "");
+		text = text.replaceAll(",}", "}");
+		stateStorage.setState(text);
 
 		final List<String> imageList = new ArrayList<String>();
 		ImageRescaleCollector irc = new ImageRescaleCollector() {
@@ -152,7 +153,10 @@ public class GuiContainer extends ResizeComposite {
 		page.encode(shb, irc);
 		stateStorage.setHTML(shb.toSafeHtml().asString());
 
-		String imageStr = Strings.join(imageList.toArray(new String[0]), "\n");
+		String imageStr = "";
+		for (String c : imageList) {
+			imageStr += "\n" + c;
+		}
 		stateStorage.setRequiredImages(imageStr);
 
 		saveButton.replaceIconText("icon-time", "saving ...");
