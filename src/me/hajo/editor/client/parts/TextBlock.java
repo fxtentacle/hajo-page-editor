@@ -34,11 +34,11 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 
 	void updateDisplay() {
 		content.clear();
-		text.setHTML(makeSafeHtml(currentText));
+		text.setHTML(makeSafeHtml(currentText, true));
 		content.add(text);
 	}
 
-	protected SafeHtml makeSafeHtml(String text2) {
+	protected SafeHtml makeSafeHtml(String text2, boolean previewMode) {
 		HajoPage masterPage = page, tryme;
 		while ((tryme = masterPage.getParentPage()) != null)
 			masterPage = tryme;
@@ -75,13 +75,21 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 			else
 				useMe = usePL;
 
-			shb.append(useMe.open);
-
 			if (para.startsWith("LINK[")) {
 				String[] parts = para.split("[\\[\\]]+");
-				String escapedUrl = SafeHtmlUtils.htmlEscape(parts[2].trim());
-				linkTable.put(parts[1].trim(), escapedUrl);
+				String key = parts[1].trim();
+				String url = parts[2].trim();
+				String escapedUrl = SafeHtmlUtils.htmlEscape(url);
+				linkTable.put(key, escapedUrl);
+
+				if (previewMode) {
+					shb.append(useMe.open);
+					shb.appendEscaped("Link: [" + key + "] -> " + url);
+					shb.append(useMe.close);
+				}
 			} else {
+				shb.append(useMe.open);
+
 				String[] boldParts = para.split("[*]");
 				for (int i = 0; i < boldParts.length; i++) {
 					boolean bold = i % 2 != 0;
@@ -119,9 +127,9 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 					if (bold)
 						shb.append(useS.close);
 				}
-			}
 
-			shb.append(useMe.close);
+				shb.append(useMe.close);
+			}
 		}
 		return shb.toSafeHtml();
 	}
@@ -135,7 +143,7 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 
 	@Override
 	public void encode(SafeHtmlBuilder shb, ImageRescaleCollector irc) {
-		shb.append(makeSafeHtml(currentText));
+		shb.append(makeSafeHtml(currentText, false));
 	}
 
 	@Override

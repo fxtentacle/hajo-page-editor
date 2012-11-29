@@ -28,6 +28,7 @@ public class HajoPage extends FlowPanel implements HajoPagePart {
 
 	@Override
 	public void encode(SafeHtmlBuilder shb, ImageRescaleCollector irc) {
+		linkTable.clear();
 		for (int i = 0; i < getWidgetCount(); i++) {
 			Widget w = getWidget(i);
 			if (w instanceof HajoPagePart) {
