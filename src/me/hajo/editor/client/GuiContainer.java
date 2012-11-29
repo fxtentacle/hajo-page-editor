@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 import me.hajo.editor.client.EntryPoint.StateStorage;
+import me.hajo.editor.client.HajoPagePart.ImageRescaleCollector;
 import me.hajo.editor.client.parts.AddBlockButton;
+import me.hajo.editor.client.parts.ImageBlock;
 import me.hajo.editor.client.parts.TextBlock;
 import me.hajo.editor.helpers.HajoToolbar;
 import me.hajo.editor.helpers.LinkButton;
@@ -50,7 +52,7 @@ public class GuiContainer extends ResizeComposite {
 		public Map<String, String> id2name;
 	}
 
-	ImagesAvailable imagesAvailable = new ImagesAvailable();
+	public static ImagesAvailable imagesAvailable = new ImagesAvailable();
 
 	public GuiContainer(HTMLPanel ocanvas, String image_upload_url, String image_download_url, final StateStorage stateStorage) {
 		imageUploader = new ImageUploader(image_upload_url);
@@ -61,6 +63,7 @@ public class GuiContainer extends ResizeComposite {
 		page = new FlowPanel();
 		ocanvas.add(page);
 
+		page.add(new ImageBlock(page));
 		page.add(new TextBlock(page));
 		page.add(new AddBlockButton(page));
 
@@ -99,9 +102,15 @@ public class GuiContainer extends ResizeComposite {
 			}
 			page.clear();
 
+			ImageRescaleCollector irc = new ImageRescaleCollector() {
+				@Override
+				public String addRequest(String fullURL, int width) {
+					return fullURL + "&width=" + width;
+				}
+			};
 			SafeHtmlBuilder shb = new SafeHtmlBuilder();
 			for (HajoPagePart cur : parts) {
-				cur.encode(shb);
+				cur.encode(shb, irc);
 			}
 			page.add(new HTML(shb.toSafeHtml()));
 		} else {
