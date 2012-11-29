@@ -142,10 +142,6 @@ public class ImageUploader extends Composite {
 	}
 
 	public Map<String, String> getMap() {
-		Map<String, String> copy = new HashMap<String, String>();
-		for (Entry<String, String> cur : id2name.entrySet()) {
-			copy.put(cur.getKey(), cur.getValue());
-		}
-		return copy;
+		return id2name;
 	}
 }
