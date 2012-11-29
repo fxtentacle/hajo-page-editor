@@ -178,12 +178,12 @@ public class BlockBase extends Composite implements HajoPagePart {
 		}));
 
 		List<DropdownEntry> entries = new ArrayList<DropdownEntry>();
-		entries.add(new DropdownEntry("Text", ""));
-		entries.add(new DropdownEntry("Image", ""));
-		entries.add(new DropdownEntry("Split", ""));
-		entries.add(new DropdownEntry("Center", ""));
-		entries.add(new DropdownEntry("Spacer", ""));
-		entries.add(new DropdownEntry("Delete", ""));
+		entries.add(new DropdownEntry("Text", "icon-pencil"));
+		entries.add(new DropdownEntry("Image", "icon-picture"));
+		entries.add(new DropdownEntry("Split", "icon-columns"));
+		entries.add(new DropdownEntry("Center", "icon-align-center"));
+		entries.add(new DropdownEntry("Spacer", "icon-resize-vertical"));
+		entries.add(new DropdownEntry("Delete", "icon-trash"));
 
 		DropdownHelper.makeDropdown(toolbar.addGroup(), "Type: ", true, entries, currentType, new DropdownCallback() {
 			@Override

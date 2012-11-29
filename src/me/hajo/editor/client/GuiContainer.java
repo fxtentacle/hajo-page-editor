@@ -97,11 +97,11 @@ public class GuiContainer extends ResizeComposite {
 		content.clear();
 		content.add(page);
 
-		toolbar.addCustom("preview", previewToggle = new LinkButton("", "Preview", "", new ClickHandler() {
+		toolbar.addCustom("preview", previewToggle = new LinkButton("icon-plane", "Preview", "", new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				boolean makeActive = !previewToggle.getStyleName().contains("active");
-				previewToggle.setStyleName("active", makeActive);
+				previewToggle.setStyleName("active btn-primary", makeActive);
 				reRender(makeActive);
 			}
 		}));
@@ -153,6 +153,8 @@ public class GuiContainer extends ResizeComposite {
 
 	protected void reRender(boolean goToPreview) {
 		if (goToPreview) {
+			selectedItemChanged(null);
+			
 			ImageRescaleCollector irc = new ImageRescaleCollector() {
 				@Override
 				public String addRequest(String fullURL, int width) {

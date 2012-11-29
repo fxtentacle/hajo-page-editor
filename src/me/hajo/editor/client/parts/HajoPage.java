@@ -66,13 +66,19 @@ public class HajoPage extends FlowPanel implements HajoPagePart {
 	}
 
 	public void selectItem(BlockBase item) {
+		HajoPage p = getParentPage();
+		if (p != null)
+			p.selectItem(item);
+	}
+
+	public HajoPage getParentPage() {
 		Widget w = getParent();
 		while (w != null) {
 			if (w instanceof BlockBase) {
-				((BlockBase) w).page.selectItem(item);
-				return;
+				return ((BlockBase) w).page;
 			}
 			w = w.getParent();
 		}
+		return null;
 	}
 }

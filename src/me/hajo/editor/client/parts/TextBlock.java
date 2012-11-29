@@ -18,6 +18,9 @@ import com.google.gwt.dom.client.Style.Position;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -124,7 +127,6 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 
 	public TextBlock(final HajoPage page) {
 		super(page, 0);
-		currentStyle = "Paragraph";
 		updateDisplay();
 	}
 
@@ -189,7 +191,15 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 				updateDisplay();
 			}
 		});
+		editor.addKeyPressHandler(new KeyPressHandler() {
+			@Override
+			public void onKeyPress(KeyPressEvent event) {
+				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+					currentText = editor.getText();
+					updateDisplay();
+				}
+			}
+		});
 		target.add(editor);
 	}
-
 }
