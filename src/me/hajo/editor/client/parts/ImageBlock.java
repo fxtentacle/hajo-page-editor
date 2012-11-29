@@ -102,7 +102,7 @@ public class ImageBlock extends BlockBase implements HajoPagePart {
 
 		String url = GuiContainer.imagesAvailable.image_download_url + selectedImageID;
 		if (irc == null) {
-			return TEMPLATES.mkimage(url, width + "px");
+			return TEMPLATES.mkimage(url, "100%");
 		} else {
 			return TEMPLATES.mkimage(irc.addRequest(url, width), width + "px");
 		}
