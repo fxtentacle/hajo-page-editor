@@ -29,62 +29,12 @@ public class ImageBlock extends BlockBase implements HajoPagePart {
 	private static final MyTemplates TEMPLATES = GWT.create(MyTemplates.class);
 
 	HTML show = new HTML();
-	FlowPanel imageShow = new FlowPanel();
 	String selectedImageID = null;
 
-	HandlerRegistration handlerReg;
-
-	void goToDisplayMode() {
-		if (handlerReg != null)
-			handlerReg.removeHandler();
-
+	void updateDisplay() {
 		content.clear();
 		show.setHTML(makeSafeHtml(null));
 		content.add(show);
-		handlerReg = show.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				goToEditMode();
-			}
-		});
-	}
-
-	void goToEditMode() {
-		if (handlerReg != null)
-			handlerReg.removeHandler();
-
-		content.clear();
-		imageShow.clear();
-		if (GuiContainer.imagesAvailable.id2name.size() == 0) {
-			Label label = new Label("Please upload images first. Then click here to retry ...");
-			label.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					goToEditMode();
-				}
-			});
-			imageShow.add(label);
-		}
-		for (final String key : GuiContainer.imagesAvailable.id2name.keySet()) {
-			Image addme = new Image(GuiContainer.imagesAvailable.image_download_url + key);
-			addme.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					selectedImageID = key;
-					goToDisplayMode();
-				}
-			});
-			addme.setWidth("128px");
-			addme.setHeight("auto");
-			addme.getElement().getStyle().setFloat(Float.LEFT);
-			addme.getElement().getStyle().setMargin(5, Unit.PX);
-			imageShow.add(addme);
-		}
-		Label clear = new Label(" ");
-		clear.getElement().getStyle().setClear(Clear.BOTH);
-		imageShow.add(clear);
-		content.add(imageShow);
-		handlerReg = null;
 	}
 
 	protected SafeHtml makeSafeHtml(ImageRescaleCollector irc) {
@@ -105,7 +55,7 @@ public class ImageBlock extends BlockBase implements HajoPagePart {
 
 	public ImageBlock(final HajoPage page) {
 		super(page, 1);
-		goToDisplayMode();
+		updateDisplay();
 	}
 
 	@Override
@@ -123,6 +73,45 @@ public class ImageBlock extends BlockBase implements HajoPagePart {
 	@Override
 	public void deserialize(PagePartStorage pps) {
 		selectedImageID = pps.ImageID;
-		goToDisplayMode();
+		updateDisplay();
+	}
+
+	@Override
+	public void insertEditor(FlowPanel target) {
+		FlowPanel imageShow = new FlowPanel();
+		fill(imageShow);
+		target.add(imageShow);
+	}
+
+	public void fill(final FlowPanel imageShow) {
+		imageShow.clear();
+		if (GuiContainer.imagesAvailable.id2name.size() == 0) {
+			Label label = new Label("Please upload images first. Then click here to retry ...");
+			label.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					fill(imageShow);
+				}
+			});
+			imageShow.add(label);
+		}
+		for (final String key : GuiContainer.imagesAvailable.id2name.keySet()) {
+			Image addme = new Image(GuiContainer.imagesAvailable.image_download_url + key);
+			addme.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					selectedImageID = key;
+					updateDisplay();
+				}
+			});
+			addme.setWidth("128px");
+			addme.setHeight("auto");
+			addme.getElement().getStyle().setFloat(Float.LEFT);
+			addme.getElement().getStyle().setMargin(5, Unit.PX);
+			imageShow.add(addme);
+		}
+		Label clear = new Label(" ");
+		clear.getElement().getStyle().setClear(Clear.BOTH);
+		imageShow.add(clear);
 	}
 }

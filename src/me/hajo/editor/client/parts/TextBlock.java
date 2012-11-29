@@ -21,44 +21,18 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.TextArea;
 
 public class TextBlock extends BlockBase implements HajoPagePart {
 	HTML text = new HTML();
-	TextArea editor = new TextArea();
+	String currentText = "Click me to edit ...";
 
-	HandlerRegistration handlerReg;
-
-	void goToDisplayMode() {
-		if (handlerReg != null)
-			handlerReg.removeHandler();
-
+	void updateDisplay() {
 		content.clear();
-		text.setHTML(makeSafeHtml(editor.getText()));
+		text.setHTML(makeSafeHtml(currentText));
 		content.add(text);
-		handlerReg = text.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				event.preventDefault();
-				goToEditMode();
-			}
-		});
-	}
-
-	void goToEditMode() {
-		if (handlerReg != null)
-			handlerReg.removeHandler();
-
-		content.clear();
-		content.add(editor);
-		editor.setFocus(true);
-		handlerReg = editor.addBlurHandler(new BlurHandler() {
-			@Override
-			public void onBlur(BlurEvent event) {
-				goToDisplayMode();
-			}
-		});
 	}
 
 	protected SafeHtml makeSafeHtml(String text2) {
@@ -151,32 +125,27 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 	public TextBlock(final HajoPage page) {
 		super(page, 0);
 		currentStyle = "Headline";
-
-		editor.setText("Click me to edit ...");
-		editor.setCharacterWidth(80);
-		editor.setVisibleLines(20);
-		goToDisplayMode();
+		updateDisplay();
 	}
 
 	@Override
 	public void encode(SafeHtmlBuilder shb, ImageRescaleCollector irc) {
-		shb.append(makeSafeHtml(editor.getText()));
+		shb.append(makeSafeHtml(currentText));
 	}
 
 	@Override
 	public PagePartStorage serialize() {
 		PagePartStorage pps = new PagePartStorage("Text");
-		pps.Text = editor.getText();
+		pps.Text = currentText;
 		pps.TextStyle = currentStyle;
 		return pps;
 	}
 
 	@Override
 	public void deserialize(PagePartStorage pps) {
-		editor.setText(pps.Text);
-		if (pps.TextStyle != null)
-			currentStyle = pps.TextStyle;
-		goToDisplayMode();
+		currentText = pps.Text;
+		currentStyle = pps.TextStyle;
+		updateDisplay();
 	}
 
 	@Override
@@ -193,10 +162,26 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 			@Override
 			public void OnSelect(String key) {
 				currentStyle = key;
-				goToDisplayMode();
+				updateDisplay();
 			}
 		});
 
 		return toolbar;
 	}
+
+	@Override
+	public void insertEditor(FlowPanel target) {
+		TextArea editor = new TextArea();
+		editor.setText(currentText);
+		editor.setCharacterWidth(80);
+		editor.setVisibleLines(20);
+		editor.addBlurHandler(new BlurHandler() {
+			@Override
+			public void onBlur(BlurEvent event) {
+				updateDisplay();
+			}
+		});
+		target.add(editor);
+	}
+
 }
