@@ -22,7 +22,7 @@ import com.google.gwt.user.client.ui.Label;
 
 public class SplitBlock extends BlockBase implements HajoPagePart {
 	public interface MyTemplates extends SafeHtmlTemplates {
-		@Template("<td width=\"{0}\">")
+		@Template("<td width=\"{0}\" style=\"vertical-align: top;\">")
 		SafeHtml mktd(String width);
 	}
 
@@ -31,15 +31,16 @@ public class SplitBlock extends BlockBase implements HajoPagePart {
 	private HajoPage left;
 	private HajoPage right;
 
-	int currentSplit = 4;
+	int currentSplit = 2;
+	double currentPadding = 1;
 
 	public SplitBlock(final FlowPanel page) {
 		super(page, 2);
 
-		left = new HajoPage(page);
+		left = new HajoPage(page, -1);
 		left.add(new AddBlockButton(left));
 
-		right = new HajoPage(page);
+		right = new HajoPage(page, -1);
 		right.add(new AddBlockButton(right));
 
 		left.getElement().getStyle().setFloat(Float.LEFT);
@@ -56,10 +57,27 @@ public class SplitBlock extends BlockBase implements HajoPagePart {
 		for (int i = 1; i < 8; i++)
 			entries.add(new DropdownEntry("" + i, "", "" + i + "/8"));
 
-		DropdownHelper.makeDropdown(toolbar.addGroup(), "Split at ", true, entries, 3, new DropdownCallback() {
+		DropdownHelper.makeDropdown(toolbar.addGroup(), "Split at ", true, entries, 1, new DropdownCallback() {
 			@Override
 			public void OnSelect(String key) {
 				currentSplit = Integer.parseInt(key);
+				updateSplit();
+			}
+		});
+
+		entries = new ArrayList<DropdownEntry>();
+		entries.add(new DropdownEntry("0", "", "Off"));
+		entries.add(new DropdownEntry("-0.5", "", "Left: 1/2"));
+		entries.add(new DropdownEntry("-1", "", "Left: 1"));
+		entries.add(new DropdownEntry("-2", "", "Left: 2"));
+		entries.add(new DropdownEntry("0.5", "", "Right: 1/2"));
+		entries.add(new DropdownEntry("1", "", "Right: 1"));
+		entries.add(new DropdownEntry("2", "", "Right: 2"));
+
+		DropdownHelper.makeDropdown(toolbar.addGroup(), "Padding: ", true, entries, 5, new DropdownCallback() {
+			@Override
+			public void OnSelect(String key) {
+				currentPadding = Double.parseDouble(key);
 				updateSplit();
 			}
 		});
@@ -71,36 +89,57 @@ public class SplitBlock extends BlockBase implements HajoPagePart {
 		});
 	}
 
-	int lastWidth = -1;
-
 	private void updateSplit() {
-		int width = content.getOffsetWidth();
-		if (width == 0)
-			width = lastWidth;
-		else
-			lastWidth = width;
+		final double percentL, percentR;
+		if (currentPadding > 0) {
+			percentL = (100.0 * (double) currentSplit / 8.0);
+			percentR = 100 - (100.0 * (double) (currentSplit + currentPadding) / 8.0);
+		} else {
+			percentL = (100.0 * (double) (currentSplit + currentPadding) / 8.0);
+			percentR = 100 - (100.0 * (double) currentSplit / 8.0);
+		}
+		left.getElement().getStyle().setWidth(percentL, Unit.PCT);
+		right.getElement().getStyle().setWidth(percentR, Unit.PCT);
 
-		int percent = (int) (100.0 * (double) currentSplit / 8.0);
-		left.getElement().getStyle().setWidth(percent, Unit.PCT);
-		right.getElement().getStyle().setWidth(100 - percent, Unit.PCT);
+		updatePageWidth(getWidth());
 	}
 
 	@Override
 	public void encode(SafeHtmlBuilder shb, ImageRescaleCollector irc) {
-		int lw = (int) ((double) lastWidth * (double) currentSplit / 8.0);
+		int width = getWidth();
+		updatePageWidth(width);
+		final int padw = width - left.pageWidth - right.pageWidth;
 
 		shb.appendHtmlConstant("<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\">");
 		shb.appendHtmlConstant("<tr>");
 
-		shb.append(TEMPLATES.mktd("" + lw + "px"));
+		shb.append(TEMPLATES.mktd("" + left.pageWidth + "px"));
 		left.encode(shb, irc);
 		shb.appendHtmlConstant("</td>");
 
-		shb.append(TEMPLATES.mktd("" + (lastWidth - lw) + "px"));
+		if (padw > 1) {
+			shb.append(TEMPLATES.mktd("" + padw + "px"));
+			shb.appendHtmlConstant("</td>");
+		}
+
+		shb.append(TEMPLATES.mktd("" + right.pageWidth + "px"));
 		right.encode(shb, irc);
 		shb.appendHtmlConstant("</td>");
 
 		shb.appendHtmlConstant("</tr>");
 		shb.appendHtmlConstant("</table>");
+	}
+
+	public void updatePageWidth(int width) {
+		final int lw, rw;
+		if (currentPadding > 0) {
+			lw = (int) ((double) width * (double) currentSplit / 8.0);
+			rw = width - (int) ((double) width * (double) (currentSplit + currentPadding) / 8.0);
+		} else {
+			lw = (int) ((double) width * (double) (currentSplit + currentPadding) / 8.0);
+			rw = width - (int) ((double) width * (double) currentSplit / 8.0);
+		}
+		left.setPageWidth(lw);
+		right.setPageWidth(rw);
 	}
 }

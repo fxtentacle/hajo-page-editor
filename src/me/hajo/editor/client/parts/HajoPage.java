@@ -8,8 +8,15 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class HajoPage extends FlowPanel implements HajoPagePart {
 
-	public HajoPage(final FlowPanel page) {
+	public int pageWidth;
+
+	public HajoPage(final FlowPanel page, int pageWidth) {
+		this.pageWidth = pageWidth;
 		setStyleName("hajopage");
+	}
+
+	public void setPageWidth(int pageWidth) {
+		this.pageWidth = pageWidth;
 	}
 
 	@Override

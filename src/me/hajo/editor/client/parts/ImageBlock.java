@@ -86,24 +86,18 @@ public class ImageBlock extends BlockBase implements HajoPagePart {
 		handlerReg = null;
 	}
 
-	int lastWidth = -1;
-
 	protected SafeHtml makeSafeHtml(ImageRescaleCollector irc) {
 		if (selectedImageID == null) {
 			if (irc != null)
 				return SafeHtmlUtils.fromString("");
 			return SafeHtmlUtils.fromString("Click to select image");
 		}
-		int width = content.getOffsetWidth();
-		if (width == 0)
-			width = lastWidth;
-		else
-			lastWidth = width;
 
 		String url = GuiContainer.imagesAvailable.image_download_url + selectedImageID;
 		if (irc == null) {
 			return TEMPLATES.mkimage(url, "100%");
 		} else {
+			int width = getWidth();
 			return TEMPLATES.mkimage(irc.addRequest(url, width), width + "px");
 		}
 	}

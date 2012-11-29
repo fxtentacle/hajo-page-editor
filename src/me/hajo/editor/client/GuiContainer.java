@@ -102,8 +102,8 @@ public class GuiContainer extends ResizeComposite {
 					parts.add((HajoPagePart) w);
 				}
 			}
-			page.clear();
 
+			// first collect HTML while still visible
 			ImageRescaleCollector irc = new ImageRescaleCollector() {
 				@Override
 				public String addRequest(String fullURL, int width) {
@@ -114,6 +114,9 @@ public class GuiContainer extends ResizeComposite {
 			for (HajoPagePart cur : parts) {
 				cur.encode(shb, irc);
 			}
+
+			// then clear and replace
+			page.clear();
 			page.add(new HTML(shb.toSafeHtml()));
 		} else {
 			page.clear();

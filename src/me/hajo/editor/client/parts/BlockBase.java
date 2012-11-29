@@ -62,6 +62,7 @@ public class BlockBase extends Composite implements HajoPagePart {
 		borderStyle.setBorderWidth(1, Unit.PX);
 		borderStyle.setBorderStyle(BorderStyle.DOTTED);
 		borderStyle.setMarginBottom(5, Unit.PX);
+		content.getElement().getStyle().setPadding(5, Unit.PX);
 
 		Group upDown = toolbar.addGroup();
 		// upDown.setStyleName("btn-group-vertical");
@@ -119,6 +120,13 @@ public class BlockBase extends Composite implements HajoPagePart {
 			this.open = open;
 			this.close = close;
 		}
+	}
+
+	protected int getWidth() {
+		Widget p = getParent();
+		if (p instanceof HajoPage)
+			return ((HajoPage) p).pageWidth;
+		return content.getOffsetWidth() + 2;
 	}
 
 	protected StyledItem getStyledItemInContext(String tag, String context) {
