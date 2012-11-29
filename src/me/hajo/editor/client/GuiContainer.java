@@ -18,6 +18,7 @@ import me.hajo.editor.helpers.LinkButton;
 import me.hajo.editor.model.PagePartStorage;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dev.util.Strings;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.json.client.JSONValue;
@@ -92,25 +93,21 @@ public class GuiContainer extends ResizeComposite {
 				reRender(makeActive);
 			}
 		}));
-		toolbar.addCustom("save", new LinkButton("icon-save", "Save", "btn-success", new ClickHandler() {
+		saveButton = new LinkButton("icon-save", "Save", "btn-success", new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				PagePartStorage state = page.serialize();
-				JSONValue json = stateEncoderDecoder.encode(state);
-				stateStorage.setState(json.toString());
-				stateStorage.sendToServer(new SubmitCompleteHandler() {
-					@Override
-					public void onSubmitComplete(SubmitCompleteEvent event) {
-					}
-				});
+				savePage(stateStorage);
 			}
-		}));
+		});
+		toolbar.addCustom("save", saveButton);
 
 		imagesAvailable.image_download_url = image_download_url;
 		imagesAvailable.id2name = imageUploader.getMap();
 	}
 
 	List<HajoPagePart> parts = new ArrayList<HajoPagePart>();
+
+	private LinkButton saveButton;
 
 	protected void reRender(boolean goToPreview) {
 		if (goToPreview) {
@@ -130,5 +127,42 @@ public class GuiContainer extends ResizeComposite {
 			content.clear();
 			content.add(page);
 		}
+	}
+
+	public void savePage(final StateStorage stateStorage) {
+		PagePartStorage state = page.serialize();
+		JSONValue json = stateEncoderDecoder.encode(state);
+		stateStorage.setState(json.toString());
+
+		final List<String> imageList = new ArrayList<String>();
+		ImageRescaleCollector irc = new ImageRescaleCollector() {
+			@Override
+			public String addRequest(String fullURL, int width) {
+				String ext = "";
+				int lastDot = fullURL.lastIndexOf('.');
+				if (lastDot > 0)
+					ext = fullURL.substring(lastDot);
+
+				String url = "http://FAKEHOST/" + ImageUploader.makeRandomID() + ext;
+				imageList.add(url + "\t" + width + "\t" + fullURL);
+				return url;
+			}
+		};
+		SafeHtmlBuilder shb = new SafeHtmlBuilder();
+		page.encode(shb, irc);
+		stateStorage.setHTML(shb.toSafeHtml().asString());
+
+		String imageStr = Strings.join(imageList.toArray(new String[0]), "\n");
+		stateStorage.setRequiredImages(imageStr);
+
+		saveButton.replaceIconText("icon-time", "saving ...");
+		saveButton.replaceButtonStyle("");
+		stateStorage.sendToServer(new SubmitCompleteHandler() {
+			@Override
+			public void onSubmitComplete(SubmitCompleteEvent event) {
+				saveButton.replaceIconText("icon-save", "Save");
+				saveButton.replaceButtonStyle("btn-success");
+			}
+		});
 	}
 }

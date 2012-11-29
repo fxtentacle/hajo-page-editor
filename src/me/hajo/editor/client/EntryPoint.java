@@ -21,6 +21,8 @@ public class EntryPoint implements com.google.gwt.core.client.EntryPoint {
 
 		public void setHTML(String html);
 
+		public void setRequiredImages(String html);
+
 		public void sendToServer(SubmitCompleteHandler handler);
 	}
 
@@ -36,6 +38,7 @@ public class EntryPoint implements com.google.gwt.core.client.EntryPoint {
 		String image_download_url = DOM.getElementById("image_download").getAttribute("src");
 
 		final TextArea html_output = TextArea.wrap(DOM.getElementById("html_output"));
+		final TextArea required_images = TextArea.wrap(DOM.getElementById("required_images"));
 		final TextArea json_state = TextArea.wrap(DOM.getElementById("json_state"));
 		final FormPanel state_storage = FormPanel.wrap(DOM.getElementById("state_storage"), true);
 
@@ -51,6 +54,11 @@ public class EntryPoint implements com.google.gwt.core.client.EntryPoint {
 			@Override
 			public void setHTML(String html) {
 				html_output.setText(html);
+			}
+
+			@Override
+			public void setRequiredImages(String html) {
+				required_images.setText(html);
 			}
 
 			@Override
