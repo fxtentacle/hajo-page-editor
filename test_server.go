@@ -86,8 +86,16 @@ func (ogui *WebGuiDownloader) ServeHTTP(w http.ResponseWriter, req *http.Request
 
 func main() {
 	data := &WebGuiData{attachments: make(map[string]*Attachment)}
+	http.Handle("/", http.FileServer(http.Dir("./war")))
 	http.Handle("/upload", (*WebGuiUploader)(data))
 	http.Handle("/download", (*WebGuiDownloader)(data))
+	http.HandleFunc("/delete", func(w http.ResponseWriter, req *http.Request) {
+		w.Header().Add("Access-Control-Allow-Origin", "*")
+		w.Header().Add("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Add("Access-Control-Allow-Headers", "Origin, X-HTTP-Method-Override, Content-Type, Accept")
+		w.Header().Add("Access-Control-Max-Age", "86400")
+		w.WriteHeader(http.StatusOK)
+	})
 
 	http.ListenAndServe(":8080", nil)
 }
