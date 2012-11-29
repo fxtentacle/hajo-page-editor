@@ -15,6 +15,8 @@ import me.hajo.editor.model.PagePartStorage;
 import org.fusesource.restygwt.client.JsonEncoderDecoder;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -25,6 +27,8 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
@@ -69,6 +73,7 @@ public class GuiContainer extends ResizeComposite {
 	HTML preview = new HTML();
 
 	final LinkButton previewToggle;
+	final LinkButton closeButton;
 
 	@UiField(provided = true)
 	ImageUploader imageUploader;
@@ -80,7 +85,7 @@ public class GuiContainer extends ResizeComposite {
 
 	public static ImagesAvailable imagesAvailable = new ImagesAvailable();
 
-	public GuiContainer(HTMLPanel ocanvas, String image_upload_url, String image_download_url, final StateStorage stateStorage) {
+	public GuiContainer(HTMLPanel ocanvas, String image_upload_url, String image_download_url, final String close_link, final StateStorage stateStorage) {
 		imageUploader = new ImageUploader(image_upload_url);
 		initWidget(uiBinder.createAndBindUi(this));
 		toolbarContainer.add(toolbar);
@@ -112,6 +117,13 @@ public class GuiContainer extends ResizeComposite {
 			}
 		});
 		toolbar.addCustom("save", saveButton);
+		toolbar.addCustom("close", closeButton = new LinkButton("icon-signout", "Close", "btn-warning", new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				Location.assign(close_link);
+			}
+		}));
+		toolbar.addStyleName("pull-right");
 
 		imagesAvailable.image_download_url = image_download_url;
 		imagesAvailable.id2name = imageUploader.getMap();
@@ -137,6 +149,8 @@ public class GuiContainer extends ResizeComposite {
 	BlockBase currentlySelectedItem = null;
 
 	protected void selectedItemChanged(BlockBase item) {
+		closeButton.replaceButtonStyle("btn-warning");
+
 		editUtilsContainer.clear();
 		editorContainer.clear();
 
@@ -187,44 +201,52 @@ public class GuiContainer extends ResizeComposite {
 	}
 
 	public void savePage(final StateStorage stateStorage) {
-		PagePartStorage state = page.serialize();
-		JSONValue json = stateEncoderDecoder.encode(state);
-		String text = json.toString().replaceAll("\\s*\"[^\"]+\":null,?\\s*", "");
-		text = text.replaceAll(",}", "}");
-		stateStorage.setState(text);
-
-		final List<String> imageList = new ArrayList<String>();
-		ImageRescaleCollector irc = new ImageRescaleCollector() {
-			@Override
-			public String addRequest(String imageID, String filename, int width) {
-				String ext = "";
-				int lastDot = filename.lastIndexOf('.');
-				if (lastDot > 0)
-					ext = filename.substring(lastDot);
-
-				String url = "http://FAKEHOST/" + ImageUploader.makeRandomID() + ext;
-				imageList.add(url + "\t" + width + "\t" + filename + "\t" + imageID);
-				return url;
-			}
-		};
-		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		page.encode(shb, irc);
-		stateStorage.setHTML(shb.toSafeHtml().asString());
-
-		String imageStr = "";
-		for (String c : imageList) {
-			imageStr += "\n" + c;
-		}
-		stateStorage.setRequiredImages(imageStr);
-
 		saveButton.replaceIconText("icon-time", "saving ...");
-		saveButton.replaceButtonStyle("");
-		stateStorage.sendToServer(new SubmitCompleteHandler() {
+		saveButton.setEnabled(false);
+
+		new Timer() {
 			@Override
-			public void onSubmitComplete(SubmitCompleteEvent event) {
-				saveButton.replaceIconText("icon-save", "Save");
-				saveButton.replaceButtonStyle("btn-success");
+			public void run() {
+				PagePartStorage state = page.serialize();
+				JSONValue json = stateEncoderDecoder.encode(state);
+				String text = json.toString().replaceAll("\\s*\"[^\"]+\":null,?\\s*", "");
+				text = text.replaceAll(",}", "}");
+				stateStorage.setState(text);
+
+				final List<String> imageList = new ArrayList<String>();
+				ImageRescaleCollector irc = new ImageRescaleCollector() {
+					@Override
+					public String addRequest(String imageID, String filename, int width) {
+						String ext = "";
+						int lastDot = filename.lastIndexOf('.');
+						if (lastDot > 0)
+							ext = filename.substring(lastDot);
+
+						String url = "http://FAKEHOST/" + ImageUploader.makeRandomID() + ext;
+						imageList.add(url + "\t" + width + "\t" + filename + "\t" + imageID);
+						return url;
+					}
+				};
+				SafeHtmlBuilder shb = new SafeHtmlBuilder();
+				page.encode(shb, irc);
+				stateStorage.setHTML(shb.toSafeHtml().asString());
+
+				String imageStr = "";
+				for (String c : imageList) {
+					imageStr += "\n" + c;
+				}
+				stateStorage.setRequiredImages(imageStr);
+
+				stateStorage.sendToServer(new SubmitCompleteHandler() {
+					@Override
+					public void onSubmitComplete(SubmitCompleteEvent event) {
+						saveButton.replaceIconText("icon-save", "Save");
+						saveButton.setEnabled(true);
+						closeButton.replaceButtonStyle("");
+					}
+				});
 			}
-		});
+		}.schedule(5);
+
 	}
 }
