@@ -1,7 +1,10 @@
 package me.hajo.editor.client.parts;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import me.hajo.editor.client.HajoPagePart;
 import me.hajo.editor.helpers.DropdownHelper;
@@ -15,6 +18,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.TextArea;
@@ -35,6 +39,7 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 		handlerReg = text.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				event.preventDefault();
 				goToEditMode();
 			}
 		});
@@ -61,6 +66,8 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 		StyledItem usePR = getStyledItemInContext("p", currentStyle + "R");
 		StyledItem useS = getStyledItemInContext("strong", currentStyle);
 
+		Map<String, String> linkTable = new HashMap<String, String>();
+
 		SafeHtmlBuilder shb = new SafeHtmlBuilder();
 		String[] paragraphs = text2.split("\n");
 		for (String para : paragraphs) {
@@ -84,15 +91,48 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 			else
 				shb.append(usePL.open);
 
-			String[] boldParts = para.split("[*]");
-			for (int i = 0; i < boldParts.length; i++) {
-				boolean bold = i % 2 != 0;
+			if (para.startsWith("LINK[")) {
+				String[] parts = para.split("[\\[\\]]+");
+				String escapedUrl = SafeHtmlUtils.htmlEscape(parts[1].trim());
+				linkTable.put(parts[2].trim(), escapedUrl);
+			} else {
+				String[] boldParts = para.split("[*]");
+				for (int i = 0; i < boldParts.length; i++) {
+					boolean bold = i % 2 != 0;
 
-				if (bold)
-					shb.append(useS.open);
-				shb.appendEscaped(boldParts[i]);
-				if (bold)
-					shb.append(useS.close);
+					if (bold)
+						shb.append(useS.open);
+
+					String curPart = boldParts[i];
+
+					while (curPart.length() > 0) {
+						int minIndex = curPart.length();
+						Entry<String, String> linkEntry = null;
+						for (Entry<String, String> cur : linkTable.entrySet()) {
+							String modkey = "[" + cur.getKey() + "]";
+							int idx = curPart.indexOf(modkey);
+							if (idx >= 0) {
+								minIndex = Math.min(minIndex, idx);
+								linkEntry = cur;
+							}
+						}
+						if (linkEntry != null) {
+							shb.appendEscaped(curPart.substring(0, minIndex));
+							curPart = curPart.substring(minIndex + linkEntry.getKey().length() + 2);
+
+							StyledItem link = getStyledItemInContext("a", currentStyle, "href=\"" + linkEntry.getValue() + "\"");
+							shb.append(link.open);
+							shb.appendEscaped(linkEntry.getKey());
+							shb.append(link.close);
+						} else {
+							shb.appendEscaped(curPart);
+							curPart = "";
+						}
+					}
+
+					if (bold)
+						shb.append(useS.close);
+				}
 			}
 
 			if (justify)

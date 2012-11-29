@@ -133,11 +133,15 @@ public class BlockBase extends Composite implements HajoPagePart {
 	}
 
 	protected StyledItem getStyledItemInContext(String tag, String context) {
+		return getStyledItemInContext(tag, context, "");
+	}
+
+	protected StyledItem getStyledItemInContext(String tag, String context, String additionalAttrbutes) {
 		String stexName = "stex_" + context.replaceAll("[^a-zA-Z]", "_") + "_" + tag;
 		com.google.gwt.dom.client.Element stex = DOM.getElementById(stexName);
 
 		if (stex == null)
-			return new StyledItem(SafeHtmlUtils.fromTrustedString("<" + tag + ">"), SafeHtmlUtils.fromTrustedString("</" + tag + ">"));
+			return new StyledItem(SafeHtmlUtils.fromTrustedString("<" + tag + " " + additionalAttrbutes + " >"), SafeHtmlUtils.fromTrustedString("</" + tag + ">"));
 
 		tag = stex.getTagName();
 		String safeStyleString = "";
@@ -147,6 +151,6 @@ public class BlockBase extends Composite implements HajoPagePart {
 			safeStyleString = stex.getStyle().getProperty("cssText") + ";" + safeStyleString;
 			stex = stex.getParentElement();
 		}
-		return new StyledItem(SafeHtmlUtils.fromTrustedString("<" + tag + " style=\"" + safeStyleString + "\">"), SafeHtmlUtils.fromTrustedString("</" + tag + ">"));
+		return new StyledItem(SafeHtmlUtils.fromTrustedString("<" + tag + " style=\"" + safeStyleString + "\" " + additionalAttrbutes + " >"), SafeHtmlUtils.fromTrustedString("</" + tag + ">"));
 	}
 }
