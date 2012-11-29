@@ -1,6 +1,6 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:h="urn:import:me.hajo.editor.client">
-	<g:LayoutPanel>
+	<g:LayoutPanel ui:field="dock">
 		<g:layer top="0px" height="50px" left="10px" right="220px">
 			<g:FlowPanel styleName="bootstrap" ui:field="editUtilsContainer" />
 		</g:layer>
@@ -12,6 +12,9 @@
 		</g:layer>
 		<g:layer top="50px" bottom="0px" width="200px" right="0px">
 			<h:ImageUploader styleName="bootstrap" ui:field="imageUploader" />
+		</g:layer>
+		<g:layer height="256px" bottom="0px" left="0px" right="220px">
+			<g:FlowPanel styleName="bootstrap" ui:field="editorContainer" />
 		</g:layer>
 	</g:LayoutPanel>
 </ui:UiBinder> 

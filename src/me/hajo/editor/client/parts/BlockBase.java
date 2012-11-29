@@ -66,9 +66,7 @@ public class BlockBase extends Composite implements HajoPagePart {
 	}
 
 	public static HajoPagePart createWidgetOfType(String type, HajoPage page) {
-		if (type.equals("Add")) {
-			return new AddBlockButton(page);
-		} else if (type.equals("Text")) {
+		if (type.equals("Text")) {
 			return new TextBlock(page);
 		} else if (type.equals("Image")) {
 			return new ImageBlock(page);
@@ -166,6 +164,19 @@ public class BlockBase extends Composite implements HajoPagePart {
 			}
 		}));
 
+		upDown.addCustom("add", new LinkButton("icon-plus", "Add", "", new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				int count = page.getWidgetCount();
+				int idx = page.getWidgetIndex(BlockBase.this);
+				int idx2 = Math.min(idx + 1, count - 1);
+				HajoPagePart addme = createWidgetOfType("Text", page);
+				page.insert((Widget) addme, idx2);
+				if (addme instanceof BlockBase)
+					((BlockBase) addme).border.setFocus(true);
+			}
+		}));
+
 		List<DropdownEntry> entries = new ArrayList<DropdownEntry>();
 		entries.add(new DropdownEntry("Text", ""));
 		entries.add(new DropdownEntry("Image", ""));
@@ -180,8 +191,9 @@ public class BlockBase extends Composite implements HajoPagePart {
 				int idx = page.getWidgetIndex(BlockBase.this);
 				page.remove(BlockBase.this);
 				HajoPagePart newWidget = createWidgetOfType(key, page);
-				if (newWidget != null)
-					page.insert((Widget) newWidget, idx);
+				page.insert((Widget) newWidget, idx);
+				if (newWidget instanceof BlockBase)
+					((BlockBase) newWidget).border.setFocus(true);
 			}
 		});
 

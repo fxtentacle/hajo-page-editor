@@ -6,7 +6,6 @@ import java.util.Map;
 
 import me.hajo.editor.client.EntryPoint.StateStorage;
 import me.hajo.editor.client.HajoPagePart.ImageRescaleCollector;
-import me.hajo.editor.client.parts.AddBlockButton;
 import me.hajo.editor.client.parts.BlockBase;
 import me.hajo.editor.client.parts.HajoPage;
 import me.hajo.editor.helpers.HajoToolbar;
@@ -17,6 +16,7 @@ import org.fusesource.restygwt.client.JsonEncoderDecoder;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Overflow;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.json.client.JSONParser;
@@ -30,6 +30,7 @@ import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.ResizeComposite;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -54,6 +55,12 @@ public class GuiContainer extends ResizeComposite {
 
 	@UiField
 	FlowPanel editUtilsContainer;
+
+	@UiField
+	FlowPanel editorContainer;
+
+	@UiField
+	LayoutPanel dock;
 
 	HajoToolbar toolbar = new HajoToolbar();
 
@@ -87,8 +94,6 @@ public class GuiContainer extends ResizeComposite {
 				selectedItemChanged(item);
 			}
 		};
-		page.add(new AddBlockButton(page));
-
 		content.clear();
 		content.add(page);
 
@@ -120,6 +125,8 @@ public class GuiContainer extends ResizeComposite {
 
 	protected void selectedItemChanged(BlockBase item) {
 		editUtilsContainer.clear();
+		editorContainer.clear();
+
 		if (item != null) {
 			HajoToolbar editBar = item.getToolbar();
 			editUtilsContainer.add(editBar);
@@ -130,7 +137,13 @@ public class GuiContainer extends ResizeComposite {
 			tbpe.getStyle().setOverflow(Overflow.VISIBLE);
 			tbpe.getParentElement().getStyle().setOverflow(Overflow.VISIBLE);
 
+			item.insertEditor(editorContainer);
 		}
+
+		boolean needEditor = editorContainer.getWidgetCount() > 0;
+		dock.setWidgetBottomHeight(editorContainer, 0, Unit.PX, needEditor ? 256 : 0, Unit.PX);
+		dock.setWidgetTopBottom(canvas, 50, Unit.PX, needEditor ? 256 : 0, Unit.PX);
+
 		currentlySelectedItem = item;
 	}
 

@@ -39,10 +39,7 @@ public class SplitBlock extends BlockBase implements HajoPagePart {
 		super(page, 2);
 
 		left = new HajoPage(-1);
-		left.add(new AddBlockButton(left));
-
 		right = new HajoPage(-1);
-		right.add(new AddBlockButton(right));
 
 		left.getElement().getStyle().setFloat(Float.LEFT);
 		right.getElement().getStyle().setFloat(Float.RIGHT);

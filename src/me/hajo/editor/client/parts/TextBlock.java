@@ -13,11 +13,11 @@ import me.hajo.editor.helpers.DropdownHelper.DropdownEntry;
 import me.hajo.editor.helpers.HajoToolbar;
 import me.hajo.editor.model.PagePartStorage;
 
+import com.google.gwt.dom.client.Style;
+import com.google.gwt.dom.client.Style.Position;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -124,7 +124,7 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 
 	public TextBlock(final HajoPage page) {
 		super(page, 0);
-		currentStyle = "Headline";
+		currentStyle = "Paragraph";
 		updateDisplay();
 	}
 
@@ -171,13 +171,21 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 
 	@Override
 	public void insertEditor(FlowPanel target) {
-		TextArea editor = new TextArea();
+		final TextArea editor = new TextArea();
 		editor.setText(currentText);
 		editor.setCharacterWidth(80);
 		editor.setVisibleLines(20);
+		Style elem = editor.getElement().getStyle();
+		elem.setPosition(Position.ABSOLUTE);
+		elem.setTop(0, Unit.PX);
+		elem.setLeft(0, Unit.PX);
+		elem.setRight(0, Unit.PX);
+		elem.setBottom(0, Unit.PX);
+		editor.setWidth("auto");
 		editor.addBlurHandler(new BlurHandler() {
 			@Override
 			public void onBlur(BlurEvent event) {
+				currentText = editor.getText();
 				updateDisplay();
 			}
 		});
