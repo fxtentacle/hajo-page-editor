@@ -39,13 +39,16 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 	}
 
 	protected SafeHtml makeSafeHtml(String text2) {
+		HajoPage masterPage = page, tryme;
+		while ((tryme = masterPage.getParentPage()) != null)
+			masterPage = tryme;
+		Map<String, String> linkTable = masterPage.linkTable;
+
 		StyledItem useP = getStyledItemInContext("p", currentStyle);
 		StyledItem usePL = getStyledItemInContext("p", currentStyle + "L");
 		StyledItem usePR = getStyledItemInContext("p", currentStyle + "R");
 		StyledItem usePC = getStyledItemInContext("p", currentStyle + "C");
 		StyledItem useS = getStyledItemInContext("strong", currentStyle);
-
-		Map<String, String> linkTable = new HashMap<String, String>();
 
 		SafeHtmlBuilder shb = new SafeHtmlBuilder();
 		String[] paragraphs = text2.split("\n");
@@ -76,8 +79,8 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 
 			if (para.startsWith("LINK[")) {
 				String[] parts = para.split("[\\[\\]]+");
-				String escapedUrl = SafeHtmlUtils.htmlEscape(parts[1].trim());
-				linkTable.put(parts[2].trim(), escapedUrl);
+				String escapedUrl = SafeHtmlUtils.htmlEscape(parts[2].trim());
+				linkTable.put(parts[1].trim(), escapedUrl);
 			} else {
 				String[] boldParts = para.split("[*]");
 				for (int i = 0; i < boldParts.length; i++) {

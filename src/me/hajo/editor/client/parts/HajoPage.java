@@ -1,6 +1,8 @@
 package me.hajo.editor.client.parts;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import me.hajo.editor.client.HajoPagePart;
 import me.hajo.editor.helpers.HajoToolbar;
@@ -11,6 +13,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class HajoPage extends FlowPanel implements HajoPagePart {
+	public Map<String, String> linkTable = new HashMap<String, String>();
 
 	public int pageWidth = -1;
 
