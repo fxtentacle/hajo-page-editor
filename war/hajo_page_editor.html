@@ -69,13 +69,17 @@
   	
   	<div id="canvas" style="margin: auto; position: relative; width: 760px;"></div>
   	
-  	<form id="image_upload" action="http://127.0.0.1:8080/upload" method="POST" enctype="multipart/form-data">
+  	<form id="image_upload" action="http://127.0.0.1:8080/upload" method="POST" enctype="multipart/form-data" style="display:none" >
   		<input type="file" name="weDontCare"/>
   		<input type="submit" text="weDontCare"/>
   	</form>
   	<img id="image_download" src="http://127.0.0.1:8080/download?ClientID=" style="display:none" />
+  	<form id="image_delete" action="http://127.0.0.1:8080/delete" method="POST" style="display:none" >
+  		<input type="text" name="ClientID" id="image_delete_id"/>
+  		<input type="submit" text="weDontCare"/>
+  	</form>
   	
-  	<form id="state_storage" action="/state_storage_url" method="POST">
+  	<form id="state_storage" action="/state_storage_url" method="POST" style="display:none" >
   		<textarea id="html_output" name="html_output"></textarea>
   		<textarea id="required_images" name="required_images">
 	  XX	XX	IMG_7746.JPG	04NBRD8BA4IQ8P4MHPHRT3UX5U4JNZS08QOY

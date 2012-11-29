@@ -21,12 +21,17 @@ import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.StyleInjector;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
+import com.google.gwt.user.client.ui.TextBox;
 
 public class ImageUploader extends Composite {
 	FlowPanel contents = new FlowPanel();
@@ -47,7 +52,7 @@ public class ImageUploader extends Composite {
 	List<String> idOrdering = new ArrayList<String>();
 	private SWFUpload uploader;
 
-	public ImageUploader(final String uploadUrl) {
+	public ImageUploader() {
 		final com.google.gwt.user.client.Element origDiv = DOM.createDiv();
 		origDiv.setId(makeRandomID());
 		uploadButton.getElement().appendChild(origDiv);
@@ -62,8 +67,8 @@ public class ImageUploader extends Composite {
 			@Override
 			public void execute() {
 				UploadBuilder builder = new UploadBuilder();
-				builder.setFlashURL("hajo_page_editor/swfupload.swf");
-				builder.setUploadURL(uploadUrl);
+				builder.setFlashURL(DOM.getElementById("swfupload_url").getAttribute("content"));
+				builder.setUploadURL(DOM.getElementById("image_upload").getAttribute("action"));
 
 				// Configure which file types may be selected
 				builder.setFileTypes("*.png;*.jpg;*.jpeg;*.gif");
@@ -123,15 +128,28 @@ public class ImageUploader extends Composite {
 		});
 	}
 
+	private TextBox deleteName = TextBox.wrap(DOM.getElementById("image_delete_id"));
+	private FormPanel deleteForm = FormPanel.wrap(DOM.getElementById("image_delete"), true);
+
 	void repaint() {
 		files.clear();
 		for (final String key : idOrdering) {
 			files.add(new LinkButton("icon-remove", id2name.get(key), "", new ClickHandler() {
+				HandlerRegistration handler;
+
 				@Override
 				public void onClick(ClickEvent event) {
-					idOrdering.remove(key);
-					id2name.remove(key);
-					repaint();
+					deleteName.setText(key);
+					handler = deleteForm.addSubmitCompleteHandler(new SubmitCompleteHandler() {
+						@Override
+						public void onSubmitComplete(SubmitCompleteEvent event) {
+							handler.removeHandler();
+							idOrdering.remove(key);
+							id2name.remove(key);
+							repaint();
+						}
+					});
+					deleteForm.submit();
 				}
 			}));
 			files.add(new InlineLabel(" "));

@@ -35,8 +35,6 @@ public class EntryPoint implements com.google.gwt.core.client.EntryPoint {
 
 		HTMLPanel canvas = HTMLPanel.wrap(DOM.getElementById("canvas"));
 
-		Element image_upload_form = DOM.getElementById("image_upload");
-		String image_upload_url = image_upload_form.getAttribute("action");
 		String image_download_url = DOM.getElementById("image_download").getAttribute("src");
 		String close_link = DOM.getElementById("close_link").getAttribute("href");
 
@@ -45,10 +43,8 @@ public class EntryPoint implements com.google.gwt.core.client.EntryPoint {
 		final TextArea json_state = TextArea.wrap(DOM.getElementById("json_state"));
 		final FormPanel state_storage = FormPanel.wrap(DOM.getElementById("state_storage"), true);
 
-		image_upload_form.removeFromParent();
-		state_storage.setVisible(false);
 
-		RootLayoutPanel.get().add(new GuiContainer(canvas, image_upload_url, image_download_url, close_link, new StateStorage() {
+		RootLayoutPanel.get().add(new GuiContainer(canvas, image_download_url, close_link, new StateStorage() {
 			@Override
 			public void setState(String state) {
 				json_state.setText(state);

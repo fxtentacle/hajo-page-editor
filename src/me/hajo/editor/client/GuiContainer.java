@@ -8,6 +8,7 @@ import me.hajo.editor.client.EntryPoint.StateStorage;
 import me.hajo.editor.client.HajoPagePart.ImageRescaleCollector;
 import me.hajo.editor.client.parts.BlockBase;
 import me.hajo.editor.client.parts.HajoPage;
+import me.hajo.editor.client.parts.PartRegistry;
 import me.hajo.editor.helpers.HajoToolbar;
 import me.hajo.editor.helpers.LinkButton;
 import me.hajo.editor.model.PagePartStorage;
@@ -26,6 +27,7 @@ import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window.Location;
@@ -84,9 +86,9 @@ public class GuiContainer extends ResizeComposite {
 	}
 
 	public static ImagesAvailable imagesAvailable = new ImagesAvailable();
-
-	public GuiContainer(HTMLPanel ocanvas, String image_upload_url, String image_download_url, final String close_link, final StateStorage stateStorage) {
-		imageUploader = new ImageUploader(image_upload_url);
+	
+	public GuiContainer(HTMLPanel ocanvas, String image_download_url, final String close_link, final StateStorage stateStorage) {
+		imageUploader = new ImageUploader();
 		initWidget(uiBinder.createAndBindUi(this));
 		toolbarContainer.add(toolbar);
 		this.content = ocanvas;
@@ -99,6 +101,7 @@ public class GuiContainer extends ResizeComposite {
 				selectedItemChanged(item);
 			}
 		};
+		PartRegistry.addWidget(page, "Text");
 		content.clear();
 		content.add(page);
 
@@ -141,9 +144,12 @@ public class GuiContainer extends ResizeComposite {
 		}
 		imageUploader.repaint();
 
-		PagePartStorage state = stateEncoderDecoder.decode(JSONParser.parseStrict(stateStorage.getState()));
-		if (state != null)
-			page.deserialize(state);
+		String stateString = stateStorage.getState().trim();
+		if (stateString.length() > 0) {
+			PagePartStorage state = stateEncoderDecoder.decode(JSONParser.parseStrict(stateString));
+			if (state != null)
+				page.deserialize(state);
+		}
 	}
 
 	BlockBase currentlySelectedItem = null;
@@ -185,7 +191,7 @@ public class GuiContainer extends ResizeComposite {
 			ImageRescaleCollector irc = new ImageRescaleCollector() {
 				@Override
 				public String addRequest(String imageID, String filename, int width) {
-					return imagesAvailable.image_download_url + imageID + "&width=" + width + "&name=" + filename;
+					return imagesAvailable.image_download_url + imageID;
 				}
 			};
 			SafeHtmlBuilder shb = new SafeHtmlBuilder();
