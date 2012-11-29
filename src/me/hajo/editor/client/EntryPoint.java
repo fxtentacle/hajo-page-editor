@@ -1,9 +1,6 @@
 package me.hajo.editor.client;
 
-import org.fusesource.restygwt.client.Defaults;
-
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -29,10 +26,6 @@ public class EntryPoint implements com.google.gwt.core.client.EntryPoint {
 	}
 
 	public void onModuleLoad() {
-		Defaults.setServiceRoot("./");
-		Defaults.setRequestTimeout(5000);
-		Defaults.setDateFormat("yyyy-MM-dd'T'HH:mm:ssZZZ");
-
 		HTMLPanel canvas = HTMLPanel.wrap(DOM.getElementById("canvas"));
 
 		String image_download_url = DOM.getElementById("image_download").getAttribute("src");
