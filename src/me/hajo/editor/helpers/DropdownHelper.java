@@ -2,6 +2,8 @@ package me.hajo.editor.helpers;
 
 import java.util.List;
 
+import me.hajo.editor.helpers.DropdownHelper.DropdownEntry;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -65,5 +67,12 @@ public class DropdownHelper {
 		changeType.add(typeDropdown);
 
 		return returnme;
+	}
+
+	public static int findSelection(List<DropdownEntry> entries, String currentValue) {
+		for (int i = 0; i < entries.size(); i++) {
+			if(entries.get(i).key.equals(currentValue)) return i;
+		}
+		return -1;
 	}
 }

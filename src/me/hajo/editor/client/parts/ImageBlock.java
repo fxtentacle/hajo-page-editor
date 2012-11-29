@@ -103,7 +103,7 @@ public class ImageBlock extends BlockBase implements HajoPagePart {
 		}
 	}
 
-	public ImageBlock(final FlowPanel page) {
+	public ImageBlock(final HajoPage page) {
 		super(page, 1);
 		goToDisplayMode();
 	}

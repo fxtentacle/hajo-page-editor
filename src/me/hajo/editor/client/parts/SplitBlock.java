@@ -7,6 +7,7 @@ import me.hajo.editor.client.HajoPagePart;
 import me.hajo.editor.helpers.DropdownHelper;
 import me.hajo.editor.helpers.DropdownHelper.DropdownCallback;
 import me.hajo.editor.helpers.DropdownHelper.DropdownEntry;
+import me.hajo.editor.helpers.HajoToolbar;
 import me.hajo.editor.model.PagePartStorage;
 
 import com.google.gwt.core.client.GWT;
@@ -18,7 +19,6 @@ import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.safehtml.client.SafeHtmlTemplates;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 
 public class SplitBlock extends BlockBase implements HajoPagePart {
@@ -35,7 +35,7 @@ public class SplitBlock extends BlockBase implements HajoPagePart {
 	int currentSplit = 3;
 	double currentPadding = -0.5;
 
-	public SplitBlock(final FlowPanel page) {
+	public SplitBlock(final HajoPage page) {
 		super(page, 2);
 
 		left = new HajoPage(-1);
@@ -54,34 +54,6 @@ public class SplitBlock extends BlockBase implements HajoPagePart {
 		content.add(right);
 		content.add(clear);
 
-		List<DropdownEntry> entries = new ArrayList<DropdownEntry>();
-		for (int i = 1; i < 8; i++)
-			entries.add(new DropdownEntry("" + i, "", "" + i + "/8"));
-
-		DropdownHelper.makeDropdown(toolbar.addGroup(), "Split at ", true, entries, 2, new DropdownCallback() {
-			@Override
-			public void OnSelect(String key) {
-				currentSplit = Integer.parseInt(key);
-				updateSplit();
-			}
-		});
-
-		entries = new ArrayList<DropdownEntry>();
-		entries.add(new DropdownEntry("0", "", "Off"));
-		entries.add(new DropdownEntry("-0.5", "", "Left: 1/2"));
-		entries.add(new DropdownEntry("-1", "", "Left: 1"));
-		entries.add(new DropdownEntry("-2", "", "Left: 2"));
-		entries.add(new DropdownEntry("0.5", "", "Right: 1/2"));
-		entries.add(new DropdownEntry("1", "", "Right: 1"));
-		entries.add(new DropdownEntry("2", "", "Right: 2"));
-
-		DropdownHelper.makeDropdown(toolbar.addGroup(), "Padding: ", true, entries, 1, new DropdownCallback() {
-			@Override
-			public void OnSelect(String key) {
-				currentPadding = Double.parseDouble(key);
-				updateSplit();
-			}
-		});
 		Scheduler.get().scheduleDeferred(new ScheduledCommand() {
 			@Override
 			public void execute() {
@@ -172,5 +144,43 @@ public class SplitBlock extends BlockBase implements HajoPagePart {
 				updateSplit();
 			}
 		});
+	}
+
+	@Override
+	public HajoToolbar getToolbar() {
+		HajoToolbar toolbar = super.getToolbar();
+
+		List<DropdownEntry> entries = new ArrayList<DropdownEntry>();
+		for (int i = 1; i < 8; i++)
+			entries.add(new DropdownEntry("" + i, "", "" + i + "/8"));
+
+		int sel = DropdownHelper.findSelection(entries, Integer.toString(currentSplit));
+		DropdownHelper.makeDropdown(toolbar.addGroup(), "Split at ", true, entries, sel, new DropdownCallback() {
+			@Override
+			public void OnSelect(String key) {
+				currentSplit = Integer.parseInt(key);
+				updateSplit();
+			}
+		});
+
+		entries = new ArrayList<DropdownEntry>();
+		entries.add(new DropdownEntry("0", "", "Off"));
+		entries.add(new DropdownEntry("-0.5", "", "Left: 1/2"));
+		entries.add(new DropdownEntry("-1", "", "Left: 1"));
+		entries.add(new DropdownEntry("-2", "", "Left: 2"));
+		entries.add(new DropdownEntry("0.5", "", "Right: 1/2"));
+		entries.add(new DropdownEntry("1", "", "Right: 1"));
+		entries.add(new DropdownEntry("2", "", "Right: 2"));
+
+		sel = DropdownHelper.findSelection(entries, Double.toString(currentPadding));
+		DropdownHelper.makeDropdown(toolbar.addGroup(), "Padding: ", true, entries, sel, new DropdownCallback() {
+			@Override
+			public void OnSelect(String key) {
+				currentPadding = Double.parseDouble(key);
+				updateSplit();
+			}
+		});
+
+		return toolbar;
 	}
 }

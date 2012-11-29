@@ -18,6 +18,8 @@ import com.google.gwt.dom.client.Style.BorderStyle;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -26,6 +28,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class BlockBase extends Composite implements HajoPagePart {
@@ -35,71 +38,34 @@ public class BlockBase extends Composite implements HajoPagePart {
 	}
 
 	@UiField
-	FlowPanel border;
+	FocusPanel border;
 
 	@UiField
 	protected FlowPanel content;
 
-	@UiField
-	FlowPanel toolbarContainer;
+	protected HajoPage page;
 
-	protected HajoToolbar toolbar = new HajoToolbar();
+	protected int currentType;
 
-	protected FlowPanel page;
-
-	public BlockBase(final FlowPanel page, final int selectedType) {
-		List<DropdownEntry> entries = new ArrayList<DropdownEntry>();
-		entries.add(new DropdownEntry("Text", ""));
-		entries.add(new DropdownEntry("Image", ""));
-		entries.add(new DropdownEntry("Split", ""));
-		entries.add(new DropdownEntry("Center", ""));
-		entries.add(new DropdownEntry("Spacer", ""));
-		entries.add(new DropdownEntry("Delete", ""));
-
+	public BlockBase(final HajoPage page, final int selectedType) {
 		this.page = page;
+		this.currentType = selectedType;
 		initWidget(uiBinder.createAndBindUi(this));
-		toolbarContainer.add(toolbar);
 		Style borderStyle = border.getElement().getStyle();
 		borderStyle.setBorderColor("#000000");
 		borderStyle.setBorderWidth(1, Unit.PX);
 		borderStyle.setBorderStyle(BorderStyle.DOTTED);
 		borderStyle.setMarginBottom(5, Unit.PX);
 		content.getElement().getStyle().setPadding(5, Unit.PX);
-
-		Group upDown = toolbar.addGroup();
-		// upDown.setStyleName("btn-group-vertical");
-		upDown.addCustom("sort-up", new LinkButton("icon-sort-up", "", "", new ClickHandler() {
+		border.addFocusHandler(new FocusHandler() {
 			@Override
-			public void onClick(ClickEvent event) {
-				int idx = page.getWidgetIndex(BlockBase.this);
-				page.remove(BlockBase.this);
-				page.insert(BlockBase.this, Math.max(idx - 1, 0));
-			}
-		}));
-
-		upDown.addCustom("sort-down", new LinkButton("icon-sort-down", "", "", new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				int count = page.getWidgetCount();
-				int idx = page.getWidgetIndex(BlockBase.this);
-				page.remove(BlockBase.this);
-				page.insert(BlockBase.this, Math.min(idx + 1, count - 1));
-			}
-		}));
-
-		DropdownHelper.makeDropdown(toolbar.addGroup(), "Type: ", true, entries, selectedType, new DropdownCallback() {
-			@Override
-			public void OnSelect(String key) {
-				int idx = page.getWidgetIndex(BlockBase.this);
-				page.remove(BlockBase.this);
-				HajoPagePart newWidget = createWidgetOfType(key, page);
-				if (newWidget != null)
-					page.insert((Widget) newWidget, idx);
+			public void onFocus(FocusEvent event) {
+				page.selectItem(BlockBase.this);
 			}
 		});
 	}
 
-	public static HajoPagePart createWidgetOfType(String type, FlowPanel page) {
+	public static HajoPagePart createWidgetOfType(String type, HajoPage page) {
 		if (type.equals("Add")) {
 			return new AddBlockButton(page);
 		} else if (type.equals("Text")) {
@@ -173,4 +139,56 @@ public class BlockBase extends Composite implements HajoPagePart {
 	public void deserialize(PagePartStorage storage) {
 	}
 
+	@Override
+	public HajoToolbar getToolbar() {
+		HajoToolbar toolbar = new HajoToolbar();
+
+		Group upDown = toolbar.addGroup();
+		// upDown.setStyleName("btn-group-vertical");
+		upDown.addCustom("sort-up", new LinkButton("icon-sort-up", "", "", new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				int idx = page.getWidgetIndex(BlockBase.this);
+				page.remove(BlockBase.this);
+				page.insert(BlockBase.this, Math.max(idx - 1, 0));
+				border.setFocus(true);
+			}
+		}));
+
+		upDown.addCustom("sort-down", new LinkButton("icon-sort-down", "", "", new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				int count = page.getWidgetCount();
+				int idx = page.getWidgetIndex(BlockBase.this);
+				page.remove(BlockBase.this);
+				page.insert(BlockBase.this, Math.min(idx + 1, count - 1));
+				border.setFocus(true);
+			}
+		}));
+
+		List<DropdownEntry> entries = new ArrayList<DropdownEntry>();
+		entries.add(new DropdownEntry("Text", ""));
+		entries.add(new DropdownEntry("Image", ""));
+		entries.add(new DropdownEntry("Split", ""));
+		entries.add(new DropdownEntry("Center", ""));
+		entries.add(new DropdownEntry("Spacer", ""));
+		entries.add(new DropdownEntry("Delete", ""));
+
+		DropdownHelper.makeDropdown(toolbar.addGroup(), "Type: ", true, entries, currentType, new DropdownCallback() {
+			@Override
+			public void OnSelect(String key) {
+				int idx = page.getWidgetIndex(BlockBase.this);
+				page.remove(BlockBase.this);
+				HajoPagePart newWidget = createWidgetOfType(key, page);
+				if (newWidget != null)
+					page.insert((Widget) newWidget, idx);
+			}
+		});
+
+		return toolbar;
+	}
+
+	@Override
+	public void insertEditor(FlowPanel target) {
+	}
 }

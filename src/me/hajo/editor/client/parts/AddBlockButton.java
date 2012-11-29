@@ -1,6 +1,7 @@
 package me.hajo.editor.client.parts;
 
 import me.hajo.editor.client.HajoPagePart;
+import me.hajo.editor.helpers.HajoToolbar;
 import me.hajo.editor.helpers.LinkButton;
 import me.hajo.editor.model.PagePartStorage;
 
@@ -11,7 +12,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 
 public class AddBlockButton extends FlowPanel implements HajoPagePart {
 
-	public AddBlockButton(final FlowPanel page) {
+	public AddBlockButton(final HajoPage page) {
 		setStyleName("bootstrap");
 		add(new LinkButton("icon-plus", "Add content block", "btn-block", new ClickHandler() {
 			@Override
@@ -33,5 +34,14 @@ public class AddBlockButton extends FlowPanel implements HajoPagePart {
 
 	@Override
 	public void deserialize(PagePartStorage storage) {
+	}
+
+	@Override
+	public HajoToolbar getToolbar() {
+		return new HajoToolbar();
+	}
+
+	@Override
+	public void insertEditor(FlowPanel target) {
 	}
 }

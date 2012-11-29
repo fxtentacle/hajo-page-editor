@@ -7,6 +7,7 @@ import me.hajo.editor.client.HajoPagePart;
 import me.hajo.editor.helpers.DropdownHelper;
 import me.hajo.editor.helpers.DropdownHelper.DropdownCallback;
 import me.hajo.editor.helpers.DropdownHelper.DropdownEntry;
+import me.hajo.editor.helpers.HajoToolbar;
 import me.hajo.editor.model.PagePartStorage;
 
 import com.google.gwt.core.client.GWT;
@@ -17,7 +18,6 @@ import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.safehtml.client.SafeHtmlTemplates;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.user.client.ui.FlowPanel;
 
 public class CenterBlock extends BlockBase implements HajoPagePart {
 	public interface MyTemplates extends SafeHtmlTemplates {
@@ -31,7 +31,7 @@ public class CenterBlock extends BlockBase implements HajoPagePart {
 
 	int currentSplit = 4;
 
-	public CenterBlock(final FlowPanel page) {
+	public CenterBlock(final HajoPage page) {
 		super(page, 3);
 
 		center = new HajoPage(-1);
@@ -39,18 +39,6 @@ public class CenterBlock extends BlockBase implements HajoPagePart {
 		Style s = center.getElement().getStyle();
 		s.setProperty("margin", "0px auto");
 		content.add(center);
-
-		List<DropdownEntry> entries = new ArrayList<DropdownEntry>();
-		for (int i = 2; i < 8; i += 2)
-			entries.add(new DropdownEntry("" + i, "", "" + i + "/8"));
-
-		DropdownHelper.makeDropdown(toolbar.addGroup(), "Split at ", true, entries, 1, new DropdownCallback() {
-			@Override
-			public void OnSelect(String key) {
-				currentSplit = Integer.parseInt(key);
-				updateSplit();
-			}
-		});
 
 		Scheduler.get().scheduleDeferred(new ScheduledCommand() {
 			@Override
@@ -110,5 +98,25 @@ public class CenterBlock extends BlockBase implements HajoPagePart {
 		center = new HajoPage(-1);
 		updatePageWidth(pps.Width);
 		center.deserialize(pps.Children.get(0));
+	}
+
+	@Override
+	public HajoToolbar getToolbar() {
+		HajoToolbar toolbar = super.getToolbar();
+
+		List<DropdownEntry> entries = new ArrayList<DropdownEntry>();
+		for (int i = 2; i < 8; i += 2)
+			entries.add(new DropdownEntry("" + i, "", "" + i + "/8"));
+
+		int sel = DropdownHelper.findSelection(entries, Integer.toString(currentSplit));
+		DropdownHelper.makeDropdown(toolbar.addGroup(), "Split at ", true, entries, sel, new DropdownCallback() {
+			@Override
+			public void OnSelect(String key) {
+				currentSplit = Integer.parseInt(key);
+				updateSplit();
+			}
+		});
+
+		return toolbar;
 	}
 }

@@ -7,12 +7,12 @@ import me.hajo.editor.client.HajoPagePart;
 import me.hajo.editor.helpers.DropdownHelper;
 import me.hajo.editor.helpers.DropdownHelper.DropdownCallback;
 import me.hajo.editor.helpers.DropdownHelper.DropdownEntry;
+import me.hajo.editor.helpers.HajoToolbar;
 import me.hajo.editor.model.PagePartStorage;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 
 public class SpacerBlock extends BlockBase implements HajoPagePart {
@@ -20,21 +20,9 @@ public class SpacerBlock extends BlockBase implements HajoPagePart {
 
 	int currentSplit = 1;
 
-	public SpacerBlock(final FlowPanel page) {
+	public SpacerBlock(final HajoPage page) {
 		super(page, 4);
 		content.add(html);
-
-		List<DropdownEntry> entries = new ArrayList<DropdownEntry>();
-		for (int i = 1; i < 8; i++)
-			entries.add(new DropdownEntry("" + i, "", "" + i + " line" + (i > 1 ? "s" : "")));
-
-		DropdownHelper.makeDropdown(toolbar.addGroup(), "", true, entries, 0, new DropdownCallback() {
-			@Override
-			public void OnSelect(String key) {
-				currentSplit = Integer.parseInt(key);
-				updateSplit();
-			}
-		});
 
 		Scheduler.get().scheduleDeferred(new ScheduledCommand() {
 			@Override
@@ -74,5 +62,25 @@ public class SpacerBlock extends BlockBase implements HajoPagePart {
 	public void deserialize(PagePartStorage pps) {
 		currentSplit = pps.Split;
 		updateSplit();
+	}
+
+	@Override
+	public HajoToolbar getToolbar() {
+		HajoToolbar toolbar = super.getToolbar();
+
+		List<DropdownEntry> entries = new ArrayList<DropdownEntry>();
+		for (int i = 1; i < 8; i++)
+			entries.add(new DropdownEntry("" + i, "", "" + i + " line" + (i > 1 ? "s" : "")));
+
+		int sel = DropdownHelper.findSelection(entries, Integer.toString(currentSplit));
+		DropdownHelper.makeDropdown(toolbar.addGroup(), "", true, entries, sel, new DropdownCallback() {
+			@Override
+			public void OnSelect(String key) {
+				currentSplit = Integer.parseInt(key);
+				updateSplit();
+			}
+		});
+
+		return toolbar;
 	}
 }

@@ -10,6 +10,7 @@ import me.hajo.editor.client.HajoPagePart;
 import me.hajo.editor.helpers.DropdownHelper;
 import me.hajo.editor.helpers.DropdownHelper.DropdownCallback;
 import me.hajo.editor.helpers.DropdownHelper.DropdownEntry;
+import me.hajo.editor.helpers.HajoToolbar;
 import me.hajo.editor.model.PagePartStorage;
 
 import com.google.gwt.event.dom.client.BlurEvent;
@@ -20,7 +21,6 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.TextArea;
 
@@ -148,22 +148,9 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 
 	protected String currentStyle = "Paragraph";
 
-	public TextBlock(final FlowPanel page) {
+	public TextBlock(final HajoPage page) {
 		super(page, 0);
-
-		List<DropdownEntry> entries = new ArrayList<DropdownEntry>();
-		entries.add(new DropdownEntry("Headline", ""));
-		entries.add(new DropdownEntry("Sub-Headline", ""));
-		entries.add(new DropdownEntry("Paragraph", ""));
-
 		currentStyle = "Headline";
-		DropdownHelper.makeDropdown(toolbar.addGroup(), "Style: ", true, entries, 0, new DropdownCallback() {
-			@Override
-			public void OnSelect(String key) {
-				currentStyle = key;
-				goToDisplayMode();
-			}
-		});
 
 		editor.setText("Click me to edit ...");
 		editor.setCharacterWidth(80);
@@ -190,5 +177,26 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 		if (pps.TextStyle != null)
 			currentStyle = pps.TextStyle;
 		goToDisplayMode();
+	}
+
+	@Override
+	public HajoToolbar getToolbar() {
+		HajoToolbar toolbar = super.getToolbar();
+
+		List<DropdownEntry> entries = new ArrayList<DropdownEntry>();
+		entries.add(new DropdownEntry("Headline", ""));
+		entries.add(new DropdownEntry("Sub-Headline", ""));
+		entries.add(new DropdownEntry("Paragraph", ""));
+
+		int sel = DropdownHelper.findSelection(entries, currentStyle);
+		DropdownHelper.makeDropdown(toolbar.addGroup(), "Style: ", true, entries, sel, new DropdownCallback() {
+			@Override
+			public void OnSelect(String key) {
+				currentStyle = key;
+				goToDisplayMode();
+			}
+		});
+
+		return toolbar;
 	}
 }

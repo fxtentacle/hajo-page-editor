@@ -3,6 +3,7 @@ package me.hajo.editor.client.parts;
 import java.util.ArrayList;
 
 import me.hajo.editor.client.HajoPagePart;
+import me.hajo.editor.helpers.HajoToolbar;
 import me.hajo.editor.model.PagePartStorage;
 
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -52,6 +53,26 @@ public class HajoPage extends FlowPanel implements HajoPagePart {
 			HajoPagePart w = BlockBase.createWidgetOfType(cur.Type, this);
 			w.deserialize(cur);
 			add((Widget) w);
+		}
+	}
+
+	@Override
+	public HajoToolbar getToolbar() {
+		return new HajoToolbar();
+	}
+
+	@Override
+	public void insertEditor(FlowPanel target) {
+	}
+
+	public void selectItem(BlockBase item) {
+		Widget w = getParent();
+		while (w != null) {
+			if (w instanceof BlockBase) {
+				((BlockBase) w).page.selectItem(item);
+				return;
+			}
+			w = w.getParent();
 		}
 	}
 }

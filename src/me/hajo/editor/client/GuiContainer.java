@@ -7,6 +7,7 @@ import java.util.Map;
 import me.hajo.editor.client.EntryPoint.StateStorage;
 import me.hajo.editor.client.HajoPagePart.ImageRescaleCollector;
 import me.hajo.editor.client.parts.AddBlockButton;
+import me.hajo.editor.client.parts.BlockBase;
 import me.hajo.editor.client.parts.HajoPage;
 import me.hajo.editor.helpers.HajoToolbar;
 import me.hajo.editor.helpers.LinkButton;
@@ -15,6 +16,7 @@ import me.hajo.editor.model.PagePartStorage;
 import org.fusesource.restygwt.client.JsonEncoderDecoder;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.json.client.JSONParser;
@@ -22,6 +24,7 @@ import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
@@ -49,6 +52,9 @@ public class GuiContainer extends ResizeComposite {
 	@UiField
 	FlowPanel toolbarContainer;
 
+	@UiField
+	FlowPanel editUtilsContainer;
+
 	HajoToolbar toolbar = new HajoToolbar();
 
 	HTMLPanel content;
@@ -75,7 +81,12 @@ public class GuiContainer extends ResizeComposite {
 		content.removeFromParent();
 		canvas.add(content);
 
-		page = new HajoPage(-1);
+		page = new HajoPage(-1) {
+			@Override
+			public void selectItem(BlockBase item) {
+				selectedItemChanged(item);
+			}
+		};
 		page.add(new AddBlockButton(page));
 
 		content.clear();
@@ -103,6 +114,24 @@ public class GuiContainer extends ResizeComposite {
 		PagePartStorage state = stateEncoderDecoder.decode(JSONParser.parseStrict(stateStorage.getState()));
 		if (state != null)
 			page.deserialize(state);
+	}
+
+	BlockBase currentlySelectedItem = null;
+
+	protected void selectedItemChanged(BlockBase item) {
+		editUtilsContainer.clear();
+		if (item != null) {
+			HajoToolbar editBar = item.getToolbar();
+			editUtilsContainer.add(editBar);
+			Element tbe = editBar.getElement();
+			tbe.getStyle().setOverflow(Overflow.VISIBLE);
+			tbe.getParentElement().getStyle().setOverflow(Overflow.VISIBLE);
+			Element tbpe = editUtilsContainer.getElement();
+			tbpe.getStyle().setOverflow(Overflow.VISIBLE);
+			tbpe.getParentElement().getStyle().setOverflow(Overflow.VISIBLE);
+
+		}
+		currentlySelectedItem = item;
 	}
 
 	List<HajoPagePart> parts = new ArrayList<HajoPagePart>();
