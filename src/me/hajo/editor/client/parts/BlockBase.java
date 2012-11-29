@@ -1,6 +1,5 @@
 package me.hajo.editor.client.parts;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import me.hajo.editor.client.HajoPagePart;
@@ -45,11 +44,11 @@ public class BlockBase extends Composite implements HajoPagePart {
 
 	protected HajoPage page;
 
-	protected int currentType;
+	protected String myType;
 
-	public BlockBase(final HajoPage page, final int selectedType) {
+	public BlockBase(final HajoPage page, final String type) {
 		this.page = page;
-		this.currentType = selectedType;
+		this.myType = type;
 		initWidget(uiBinder.createAndBindUi(this));
 		Style borderStyle = border.getElement().getStyle();
 		borderStyle.setBorderColor("#000000");
@@ -63,22 +62,6 @@ public class BlockBase extends Composite implements HajoPagePart {
 				page.selectItem(BlockBase.this);
 			}
 		});
-	}
-
-	public static HajoPagePart createWidgetOfType(String type, HajoPage page) {
-		if (type.equals("Text")) {
-			return new TextBlock(page);
-		} else if (type.equals("Image")) {
-			return new ImageBlock(page);
-		} else if (type.equals("Split")) {
-			return new SplitBlock(page);
-		} else if (type.equals("Center")) {
-			return new CenterBlock(page);
-		} else if (type.equals("Spacer")) {
-			return new SpacerBlock(page);
-		} else {
-			return new BlockBase(page, -1);
-		}
 	}
 
 	@Override
@@ -170,30 +153,27 @@ public class BlockBase extends Composite implements HajoPagePart {
 				int count = page.getWidgetCount();
 				int idx = page.getWidgetIndex(BlockBase.this);
 				int idx2 = Math.min(idx + 1, count - 1);
-				HajoPagePart addme = createWidgetOfType("Text", page);
+				HajoPagePart addme = PartRegistry.createWidgetOfType("Text", page);
 				page.insert((Widget) addme, idx2);
 				if (addme instanceof BlockBase)
 					((BlockBase) addme).border.setFocus(true);
 			}
 		}));
 
-		List<DropdownEntry> entries = new ArrayList<DropdownEntry>();
-		entries.add(new DropdownEntry("Text", "icon-pencil"));
-		entries.add(new DropdownEntry("Image", "icon-picture"));
-		entries.add(new DropdownEntry("Split", "icon-columns"));
-		entries.add(new DropdownEntry("Center", "icon-align-center"));
-		entries.add(new DropdownEntry("Spacer", "icon-resize-vertical"));
-		entries.add(new DropdownEntry("Delete", "icon-trash"));
+		List<DropdownEntry> entries = PartRegistry.getDropdown();
+		int idx = DropdownHelper.findSelection(entries, myType);
 
-		DropdownHelper.makeDropdown(toolbar.addGroup(), "Type: ", true, entries, currentType, new DropdownCallback() {
+		DropdownHelper.makeDropdown(toolbar.addGroup(), "Type: ", true, entries, idx, new DropdownCallback() {
 			@Override
 			public void OnSelect(String key) {
 				int idx = page.getWidgetIndex(BlockBase.this);
 				page.remove(BlockBase.this);
-				HajoPagePart newWidget = createWidgetOfType(key, page);
-				page.insert((Widget) newWidget, idx);
-				if (newWidget instanceof BlockBase)
-					((BlockBase) newWidget).border.setFocus(true);
+				if (!key.equals("Delete")) {
+					HajoPagePart newWidget = PartRegistry.createWidgetOfType(key, page);
+					page.insert((Widget) newWidget, idx);
+					if (newWidget instanceof BlockBase)
+						((BlockBase) newWidget).border.setFocus(true);
+				}
 			}
 		});
 

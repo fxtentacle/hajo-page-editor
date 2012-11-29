@@ -1,7 +1,6 @@
 package me.hajo.editor.client.parts;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -137,7 +136,7 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 	protected String currentStyle = "Paragraph";
 
 	public TextBlock(final HajoPage page) {
-		super(page, 0);
+		super(page, "Text");
 		updateDisplay();
 	}
 

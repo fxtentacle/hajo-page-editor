@@ -13,7 +13,7 @@
 		<g:layer top="50px" bottom="0px" width="200px" right="0px">
 			<h:ImageUploader styleName="bootstrap" ui:field="imageUploader" />
 		</g:layer>
-		<g:layer height="256px" bottom="0px" left="0px" right="220px">
+		<g:layer height="0px" bottom="0px" left="0px" right="220px">
 			<g:FlowPanel styleName="bootstrap" ui:field="editorContainer" />
 		</g:layer>
 	</g:LayoutPanel>

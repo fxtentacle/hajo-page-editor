@@ -36,13 +36,13 @@ public class SplitBlock extends BlockBase implements HajoPagePart {
 	double currentPadding = -0.5;
 
 	public SplitBlock(final HajoPage page) {
-		super(page, 2);
+		super(page, "Split");
 
 		left = new HajoPage(-1);
-		left.add(new TextBlock(left));
+		PartRegistry.addWidget(left,"Text");
 
 		right = new HajoPage(-1);
-		right.add(new TextBlock(right));
+		PartRegistry.addWidget(right,"Text");
 
 		left.getElement().getStyle().setFloat(Float.LEFT);
 		right.getElement().getStyle().setFloat(Float.RIGHT);

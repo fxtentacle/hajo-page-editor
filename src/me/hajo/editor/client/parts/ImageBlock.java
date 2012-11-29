@@ -53,7 +53,7 @@ public class ImageBlock extends BlockBase implements HajoPagePart {
 	}
 
 	public ImageBlock(final HajoPage page) {
-		super(page, 1);
+		super(page, "Image");
 		updateDisplay();
 	}
 

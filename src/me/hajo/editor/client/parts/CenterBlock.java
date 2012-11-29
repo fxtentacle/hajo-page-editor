@@ -32,10 +32,10 @@ public class CenterBlock extends BlockBase implements HajoPagePart {
 	int currentSplit = 4;
 
 	public CenterBlock(final HajoPage page) {
-		super(page, 3);
+		super(page, "Center");
 
 		center = new HajoPage(-1);
-		center.add(new TextBlock(center));
+		PartRegistry.addWidget(center,"Text");
 		Style s = center.getElement().getStyle();
 		s.setProperty("margin", "0px auto");
 		content.add(center);

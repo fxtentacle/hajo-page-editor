@@ -54,9 +54,11 @@ public class HajoPage extends FlowPanel implements HajoPagePart {
 	public void deserialize(PagePartStorage storage) {
 		clear();
 		for (PagePartStorage cur : storage.Children) {
-			HajoPagePart w = BlockBase.createWidgetOfType(cur.Type, this);
-			w.deserialize(cur);
-			add((Widget) w);
+			HajoPagePart w = PartRegistry.createWidgetOfType(cur.Type, this);
+			if (w != null) {
+				w.deserialize(cur);
+				add((Widget) w);
+			}
 		}
 	}
 

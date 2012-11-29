@@ -21,7 +21,7 @@ public class SpacerBlock extends BlockBase implements HajoPagePart {
 	int currentSplit = 1;
 
 	public SpacerBlock(final HajoPage page) {
-		super(page, 4);
+		super(page, "Spacer");
 		content.add(html);
 
 		Scheduler.get().scheduleDeferred(new ScheduledCommand() {
