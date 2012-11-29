@@ -88,12 +88,24 @@ public class PartRegistry {
 				return "icon-resize-vertical";
 			}
 		});
+		customBlockTypes.put("Custom HTML", new BlockTypeProvider() {
+			@Override
+			public HajoPagePart make(HajoPage page) {
+				return new CustomHtmlBlock(page);
+			}
+
+			@Override
+			public String getIcon() {
+				return "icon-beaker";
+			}
+		});
 
 		dropdownOrder.add("Text");
 		dropdownOrder.add("Image");
 		dropdownOrder.add("Split");
 		dropdownOrder.add("Center");
 		dropdownOrder.add("Spacer");
+		dropdownOrder.add("Custom HTML");
 	}
 
 	public static List<DropdownEntry> getDropdown() {
