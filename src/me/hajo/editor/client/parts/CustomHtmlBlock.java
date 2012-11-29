@@ -8,6 +8,8 @@ import com.google.gwt.dom.client.Style.Position;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -26,6 +28,12 @@ public class CustomHtmlBlock extends BlockBase implements HajoPagePart {
 
 	public CustomHtmlBlock(final HajoPage page) {
 		super(page, "CustomHTML");
+		text.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				event.preventDefault();
+			}
+		});
 		updateDisplay();
 	}
 
