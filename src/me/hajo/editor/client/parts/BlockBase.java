@@ -52,6 +52,7 @@ public class BlockBase extends Composite implements HajoPagePart {
 		entries.add(new DropdownEntry("Image", ""));
 		entries.add(new DropdownEntry("Split", ""));
 		entries.add(new DropdownEntry("Center", ""));
+		entries.add(new DropdownEntry("Spacer", ""));
 		entries.add(new DropdownEntry("Delete", ""));
 
 		this.page = page;
@@ -106,6 +107,8 @@ public class BlockBase extends Composite implements HajoPagePart {
 			return new SplitBlock(page);
 		} else if (type.equals("Center")) {
 			return new CenterBlock(page);
+		} else if (type.equals("Spacer")) {
+			return new SpacerBlock(page);
 		}
 		return null;
 	}
