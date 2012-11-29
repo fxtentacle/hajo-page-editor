@@ -31,8 +31,8 @@ public class SplitBlock extends BlockBase implements HajoPagePart {
 	private HajoPage left;
 	private HajoPage right;
 
-	int currentSplit = 2;
-	double currentPadding = 1;
+	int currentSplit = 3;
+	double currentPadding = -0.5;
 
 	public SplitBlock(final FlowPanel page) {
 		super(page, 2);
@@ -57,7 +57,7 @@ public class SplitBlock extends BlockBase implements HajoPagePart {
 		for (int i = 1; i < 8; i++)
 			entries.add(new DropdownEntry("" + i, "", "" + i + "/8"));
 
-		DropdownHelper.makeDropdown(toolbar.addGroup(), "Split at ", true, entries, 1, new DropdownCallback() {
+		DropdownHelper.makeDropdown(toolbar.addGroup(), "Split at ", true, entries, 2, new DropdownCallback() {
 			@Override
 			public void OnSelect(String key) {
 				currentSplit = Integer.parseInt(key);
@@ -74,7 +74,7 @@ public class SplitBlock extends BlockBase implements HajoPagePart {
 		entries.add(new DropdownEntry("1", "", "Right: 1"));
 		entries.add(new DropdownEntry("2", "", "Right: 2"));
 
-		DropdownHelper.makeDropdown(toolbar.addGroup(), "Padding: ", true, entries, 5, new DropdownCallback() {
+		DropdownHelper.makeDropdown(toolbar.addGroup(), "Padding: ", true, entries, 1, new DropdownCallback() {
 			@Override
 			public void OnSelect(String key) {
 				currentPadding = Double.parseDouble(key);
