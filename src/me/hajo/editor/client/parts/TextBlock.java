@@ -65,6 +65,7 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 		StyledItem useP = getStyledItemInContext("p", currentStyle);
 		StyledItem usePL = getStyledItemInContext("p", currentStyle + "L");
 		StyledItem usePR = getStyledItemInContext("p", currentStyle + "R");
+		StyledItem usePC = getStyledItemInContext("p", currentStyle + "C");
 		StyledItem useS = getStyledItemInContext("strong", currentStyle);
 
 		Map<String, String> linkTable = new HashMap<String, String>();
@@ -78,19 +79,23 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 			boolean justify = para.startsWith("=");
 			boolean right = para.startsWith(">");
 			boolean left = para.startsWith("<");
-			if (justify)
-				para = para.substring(1);
-			if (right)
-				para = para.substring(1);
-			if (left)
+			boolean center = para.startsWith("|");
+			if (justify || left || right || center)
 				para = para.substring(1);
 
+			final StyledItem useMe;
 			if (justify)
-				shb.append(useP.open);
+				useMe = useP;
+			else if (left)
+				useMe = usePL;
 			else if (right)
-				shb.append(usePR.open);
+				useMe = usePR;
+			else if (center)
+				useMe = usePC;
 			else
-				shb.append(usePL.open);
+				useMe = usePL;
+
+			shb.append(useMe.open);
 
 			if (para.startsWith("LINK[")) {
 				String[] parts = para.split("[\\[\\]]+");
@@ -136,12 +141,7 @@ public class TextBlock extends BlockBase implements HajoPagePart {
 				}
 			}
 
-			if (justify)
-				shb.append(useP.close);
-			else if (right)
-				shb.append(usePR.close);
-			else
-				shb.append(usePL.close);
+			shb.append(useMe.close);
 		}
 		return shb.toSafeHtml();
 	}
