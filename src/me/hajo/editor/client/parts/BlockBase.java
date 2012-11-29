@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.hajo.editor.client.HajoPagePart;
-import me.hajo.editor.client.HajoPagePart.ImageRescaleCollector;
 import me.hajo.editor.helpers.DropdownHelper;
 import me.hajo.editor.helpers.DropdownHelper.DropdownCallback;
 import me.hajo.editor.helpers.DropdownHelper.DropdownEntry;
@@ -53,6 +52,7 @@ public class BlockBase extends Composite implements HajoPagePart {
 		entries.add(new DropdownEntry("Image", ""));
 		entries.add(new DropdownEntry("Split", ""));
 		entries.add(new DropdownEntry("Center", ""));
+		entries.add(new DropdownEntry("Delete", ""));
 
 		this.page = page;
 		initWidget(uiBinder.createAndBindUi(this));
@@ -91,7 +91,8 @@ public class BlockBase extends Composite implements HajoPagePart {
 				int idx = page.getWidgetIndex(BlockBase.this);
 				page.remove(BlockBase.this);
 				Widget newWidget = convertToType(key, BlockBase.this);
-				page.insert(newWidget, idx);
+				if (newWidget != null)
+					page.insert(newWidget, idx);
 			}
 		});
 	}
@@ -103,6 +104,8 @@ public class BlockBase extends Composite implements HajoPagePart {
 			return new ImageBlock(page);
 		} else if (type.equals("Split")) {
 			return new SplitBlock(page);
+		} else if (type.equals("Center")) {
+			return new CenterBlock(page);
 		}
 		return null;
 	}
